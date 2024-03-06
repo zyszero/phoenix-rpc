@@ -1,0 +1,23 @@
+### 获取用户信息
+POST http://localhost:8080/rpc
+Content-Type: application/json
+
+{
+  "service": "cn.zyszero.phoenix.rpc.demo.api.UserService",
+  "method": "findById",
+  "args": [
+    100
+  ]
+}
+
+### 获取订单信息
+POST http://localhost:8080/rpc
+Content-Type: application/json
+
+{
+  "service": "cn.zyszero.phoenix.rpc.demo.api.OrderService",
+  "method": "findById",
+  "args": [
+    100
+  ]
+}
