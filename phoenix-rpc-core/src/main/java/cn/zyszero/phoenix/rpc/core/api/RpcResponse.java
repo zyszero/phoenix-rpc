@@ -16,9 +16,10 @@ public class RpcResponse<T> {
      * 状态: true
      */
     private boolean statues;
-
     /**
      *
      */
     private T data;
+
+    private Exception exception;
 }
