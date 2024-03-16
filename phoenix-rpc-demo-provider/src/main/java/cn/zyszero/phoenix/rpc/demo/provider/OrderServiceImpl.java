@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
 @PhoenixProvider
 public class OrderServiceImpl implements OrderService {
     @Override
-    public Order findById(Integer id) {
+    public Order findById(int id) {
         if (id == 404) {
             throw new RuntimeException("404 exception");
         }
-        return new Order(id.longValue(), 100.0f);
+        return new Order(id, 100.0f);
     }
 }

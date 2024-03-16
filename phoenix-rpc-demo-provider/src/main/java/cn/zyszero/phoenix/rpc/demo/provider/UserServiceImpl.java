@@ -9,17 +9,27 @@ import org.springframework.stereotype.Component;
 @PhoenixProvider
 public class UserServiceImpl implements UserService {
     @Override
-    public User findById(Integer id) {
+    public User findById(int id) {
         return new User(id, "ZZ-" + System.currentTimeMillis());
     }
 
     @Override
+    public User findById(int id, String name) {
+        return new User(id, "ZZ-" + System.currentTimeMillis() + "-" + name);
+    }
+
+    @Override
     public int getId(int id) {
-        return  id;
+        return id;
     }
 
     @Override
     public String getName(String name) {
         return name;
+    }
+
+    @Override
+    public String getName(int id) {
+        return "KK-" + id;
     }
 }

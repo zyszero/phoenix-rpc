@@ -30,18 +30,26 @@ public class PhoenixRpcDemoConsumerApplication {
     public ApplicationRunner consumerRunner() {
         return args -> {
             User user = userService.findById(1);
-            System.out.printf("user: %s\n", user);
+            System.out.println("RPC result userService.findById(1) = " + user);
 
 
-            int id = userService.getId(101);
-            System.out.println("id: " + id);
+            User user1 = userService.findById(2, "zys");
+            System.out.println("RPC result userService.findById(2, \"zys\") = " + user1);
+
+
+//            int id = userService.getId(101);
+//            System.out.println("id: " + id);
 
             String name = userService.getName("zys");
-            System.out.println("name: " + name);
+            System.out.println("RPC result userService.getName(\"zys\") = " + name);
 
 
-            Order order = orderService.findById(2);
-            System.out.printf("order: %s\n", order);
+            String name1 = userService.getName(123);
+            System.out.println("RPC result userService.getName(1) = " + name1);
+
+
+//            Order order = orderService.findById(2);
+//            System.out.printf("order: %s\n", order);
 
 //            Order order404 = orderService.findById(404);
 //            System.out.printf("order404: %s\n", order404);

@@ -2,6 +2,7 @@ package cn.zyszero.phoenix.rpc.core.consumer;
 
 import cn.zyszero.phoenix.rpc.core.api.RpcRequest;
 import cn.zyszero.phoenix.rpc.core.api.RpcResponse;
+import cn.zyszero.phoenix.rpc.core.util.MethodUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import okhttp3.MediaType;
@@ -26,13 +27,14 @@ public class PhoenixInvocationHandler implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-
-        // TODO 屏蔽掉 Object 类的方法
+        if (MethodUtils.checkLocalMethod(method)) {
+            return null;
+        }
 
         RpcRequest rpcRequest = new RpcRequest();
         // set service canonical name
         rpcRequest.setService(service.getCanonicalName());
-        rpcRequest.setMethod(method.getName());
+        rpcRequest.setMethodSign(MethodUtils.methodSign(method));
         rpcRequest.setArgs(args);
 
         RpcResponse rpcResponse = post(rpcRequest);

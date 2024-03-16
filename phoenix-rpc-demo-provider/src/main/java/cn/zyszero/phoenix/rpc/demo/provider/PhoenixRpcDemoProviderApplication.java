@@ -38,12 +38,25 @@ public class PhoenixRpcDemoProviderApplication {
     @Bean
     public ApplicationRunner runner() {
         return args -> {
+            // test 1 parameter method
             RpcRequest rpcRequest = new RpcRequest();
             rpcRequest.setService("cn.zyszero.phoenix.rpc.demo.api.UserService");
-            rpcRequest.setMethod("findById");
+            rpcRequest.setMethodSign("findById@1_int");
             rpcRequest.setArgs(new Object[]{100});
+
             RpcResponse rpcResponse = invoke(rpcRequest);
             System.out.println("response: " + rpcResponse.getData());
+
+
+            // test 2 parameter method
+            RpcRequest rpcRequest1 = new RpcRequest();
+            rpcRequest1.setService("cn.zyszero.phoenix.rpc.demo.api.UserService");
+            rpcRequest1.setMethodSign("findById@2_int_java.lang.String");
+            rpcRequest1.setArgs(new Object[]{100, "zyszero"});
+
+            RpcResponse rpcResponse1 = invoke(rpcRequest1);
+            System.out.println("response: " + rpcResponse1.getData());
+
         };
     }
 }
