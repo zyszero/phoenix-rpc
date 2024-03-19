@@ -3,7 +3,9 @@ package cn.zyszero.phoenix.rpc.core.consumer;
 import cn.zyszero.phoenix.rpc.core.api.RpcRequest;
 import cn.zyszero.phoenix.rpc.core.api.RpcResponse;
 import cn.zyszero.phoenix.rpc.core.util.MethodUtils;
+import cn.zyszero.phoenix.rpc.core.util.TypeUtils;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -11,6 +13,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
@@ -43,8 +46,16 @@ public class PhoenixInvocationHandler implements InvocationHandler {
             Object data = rpcResponse.getData();
             if (data instanceof JSONObject) {
                 return ((JSONObject) data).toJavaObject(method.getReturnType());
+            } else if (data instanceof JSONArray jsonArray) {
+                Object[] array = jsonArray.toArray();
+                Class<?> componentType = method.getReturnType().getComponentType();
+                Object resultArray = Array.newInstance(componentType, array.length);
+                for (int i = 0; i < array.length; i++) {
+                    Array.set(resultArray, i, array[i]);
+                }
+                return resultArray;
             } else {
-                return data;
+                return TypeUtils.cast(data, method.getReturnType());
             }
         } else {
 //            rpcResponse.getException().printStackTrace();

@@ -5,6 +5,7 @@ import cn.zyszero.phoenix.rpc.core.api.RpcRequest;
 import cn.zyszero.phoenix.rpc.core.api.RpcResponse;
 import cn.zyszero.phoenix.rpc.core.meta.ProviderMeta;
 import cn.zyszero.phoenix.rpc.core.util.MethodUtils;
+import cn.zyszero.phoenix.rpc.core.util.TypeUtils;
 import jakarta.annotation.PostConstruct;
 import lombok.Data;
 import org.springframework.context.ApplicationContext;
@@ -14,6 +15,7 @@ import org.springframework.util.MultiValueMap;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -32,15 +34,17 @@ public class ProviderBootstrap implements ApplicationContextAware {
     }
 
     private void generateInterface(Object provider) {
-        Class<?> inter = provider.getClass().getInterfaces()[0];
-        Method[] methods = inter.getMethods();
-        for (Method method : methods) {
-            // 过滤掉 Object 的方法
-            if (MethodUtils.checkLocalMethod(method)) {
-                continue;
-            }
-            createProvider(inter, provider, method);
-        }
+        Arrays.stream(provider.getClass().getInterfaces())
+                .forEach(inter -> {
+                    Method[] methods = inter.getMethods();
+                    for (Method method : methods) {
+                        // 过滤掉 Object 的方法
+                        if (MethodUtils.checkLocalMethod(method)) {
+                            continue;
+                        }
+                        createProvider(inter, provider, method);
+                    }
+                });
     }
 
     private void createProvider(Class<?> i, Object provider, Method method) {
@@ -57,13 +61,24 @@ public class ProviderBootstrap implements ApplicationContextAware {
         try {
             ProviderMeta meta = findProviderMeta(providerMetas, request.getMethodSign());
             Method method = meta.getMethod();
-            Object result = method.invoke(meta.getServiceImpl(), request.getArgs());
+            Object[] args = processArgs(request.getArgs(), method.getParameterTypes());
+            Object result = method.invoke(meta.getServiceImpl(), args);
             return new RpcResponse(true, result, null);
         } catch (InvocationTargetException e) {
             return new RpcResponse(false, null, new RuntimeException(e.getTargetException().getMessage()));
-        } catch (IllegalAccessException e) {
+        } catch (Exception e) {
             return new RpcResponse(false, null, new RuntimeException(e.getMessage()));
         }
+    }
+
+    private Object[] processArgs(Object[] args, Class<?>[] parameterTypes) {
+        if (args == null || args.length == 0) {
+            return args;
+        }
+        for (int i = 0; i < args.length; i++) {
+            args[i] = TypeUtils.cast(args[i], parameterTypes[i]);
+        }
+        return args;
     }
 
     private ProviderMeta findProviderMeta(List<ProviderMeta> providerMetas, String methodSign) {
@@ -71,15 +86,6 @@ public class ProviderBootstrap implements ApplicationContextAware {
                 .filter(meta -> meta.getMethodSign().equals(methodSign))
                 .findFirst()
                 .orElse(null);
-    }
-
-    private Method findMethod(Class<?> aClass, String methodName) {
-        for (Method method : aClass.getMethods()) {
-            if (method.getName().equals(methodName)) {
-                return method;
-            }
-        }
-        return null;
     }
 
 
