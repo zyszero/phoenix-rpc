@@ -13,6 +13,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
 import java.sql.SQLOutput;
+import java.util.List;
+import java.util.Map;
 
 @SpringBootApplication
 @Import({ConsumerConfig.class})
@@ -68,9 +70,9 @@ public class PhoenixRpcDemoConsumerApplication {
             System.out.println("RPC result userService.getId(new User(1024, \"zys\")) = " + userService.getId(new User(1024, "zys")));
 
             // 测试返回int[]
-            System.out.println("Case 9. >>===[测试返回int[]]===");
-            System.out.println("RPC result userService.getIds() = ");
-            for (int id : userService.getIds()) {
+            System.out.println("Case 9. >>===[测试参数和返回值都是int[]]===");
+            System.out.println("RPC result userService.getIds(): ");
+            for (int id : userService.getIds(new int[]{4, 5, 6})) {
                 System.out.println(" ===> " + id);
             }
 
@@ -80,17 +82,29 @@ public class PhoenixRpcDemoConsumerApplication {
                 System.out.println(" ===> " + id);
             }
 
-            System.out.println("Case 11. >>===[测试参数和返回值都是int[]]===");
-            System.out.println("RPC result userService.getIds(): ");
-            for (int id : userService.getIds(new int[]{4,5,6})) {
-                System.out.println(" ===> " + id);
-            }
+            // 测试参数和返回值都是List类型
+            System.out.println("Case 11. >>===[测试参数和返回值都是List类型]===");
+            System.out.println("RPC result userService.getList(list): ");
+            List<User> userList = userService.getList(List.of(
+                    new User(110, "zys110"),
+                    new User(111, "zys111")));
+            userList.forEach(System.out::println);
 
+            // 测试参数和返回值都是Map类型
+            System.out.println("Case 12. >>===[测试参数和返回值都是Map类型]===");
+            System.out.println("RPC result userService.getMap(map): ");
+            userService.getMap(
+                            Map.of("A200", new User(200, "zys200"),
+                                    "A201", new User(201, "zys201")))
+                    .forEach((k, v) -> System.out.println(" ===> " + k + " : " + v));
 
+            // 测试返回Boolean
+            System.out.println("Case 13. >>===[测试参数和返回值都是Boolean/boolean类型]===");
+            System.out.println("RPC result userService.getFlag(true) = " + userService.getFlag(true));
 
 //            Order order = orderService.findById(2);
 //            System.out.printf("order: %s\n", order);
-
+//
 //            Order order404 = orderService.findById(404);
 //            System.out.printf("order404: %s\n", order404);
         };

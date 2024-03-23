@@ -25,6 +25,7 @@ public class TypeUtils {
         }
 
         if (type.isArray()) {
+            // 如果是 List 转换成数组
             if (origin instanceof List list) {
                 origin = list.toArray();
             }
@@ -38,6 +39,7 @@ public class TypeUtils {
         }
 
         if (origin instanceof Map map) {
+            // 如果是 Map 转换成 JSONObject, 利用 fastjson 进行转换
             JSONObject jsonObject = new JSONObject(map);
             return jsonObject.toJavaObject(type);
         }

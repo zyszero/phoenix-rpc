@@ -13,9 +13,8 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class PhoenixInvocationHandler implements InvocationHandler {
@@ -44,16 +43,51 @@ public class PhoenixInvocationHandler implements InvocationHandler {
 
         if (rpcResponse.isStatues()) {
             Object data = rpcResponse.getData();
-            if (data instanceof JSONObject) {
+            Class<?> type = method.getReturnType();
+            System.out.println("method.getReturnType(): " + type);
+            if (data instanceof JSONObject jsonResult) {
+                if (Map.class.isAssignableFrom(type)) {
+                    Map resultMap = new HashMap<>();
+                    Type genericReturnType = method.getGenericReturnType();
+                    System.out.println("genericReturnType: " + genericReturnType);
+                    if (genericReturnType instanceof ParameterizedType parameterizedType) {
+                        Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+                        System.out.println("actualTypeArguments: " + actualTypeArguments);
+                        Class<?> keyType = (Class<?>) actualTypeArguments[0];
+                        Class<?> valueType = (Class<?>) actualTypeArguments[1];
+                        for (Map.Entry<String, Object> entry : jsonResult.entrySet()) {
+                            resultMap.put(TypeUtils.cast(entry.getKey(), keyType), TypeUtils.cast(entry.getValue(), valueType));
+                        }
+                    }
+                    return resultMap;
+                }
                 return ((JSONObject) data).toJavaObject(method.getReturnType());
             } else if (data instanceof JSONArray jsonArray) {
                 Object[] array = jsonArray.toArray();
-                Class<?> componentType = method.getReturnType().getComponentType();
-                Object resultArray = Array.newInstance(componentType, array.length);
-                for (int i = 0; i < array.length; i++) {
-                    Array.set(resultArray, i, array[i]);
+                if (type.isArray()) {
+                    Class<?> componentType = method.getReturnType().getComponentType();
+                    Object resultArray = Array.newInstance(componentType, array.length);
+                    for (int i = 0; i < array.length; i++) {
+                        Array.set(resultArray, i, array[i]);
+                    }
+                    return resultArray;
+                } else if (List.class.isAssignableFrom(type)) {
+                    List<Object> resultList = new ArrayList<>(array.length);
+                    Type genericReturnType = method.getGenericReturnType();
+                    System.out.println("genericReturnType: " + genericReturnType);
+                    if (genericReturnType instanceof ParameterizedType parameterizedType) {
+                        Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
+                        System.out.println("actualTypeArgument: " + actualTypeArgument);
+                        for (Object o : array) {
+                            resultList.add(TypeUtils.cast(o, (Class<?>) actualTypeArgument));
+                        }
+                    } else {
+                        resultList.addAll(Arrays.asList(array));
+                    }
+                    return resultList;
+                } else {
+                    return null;
                 }
-                return resultArray;
             } else {
                 return TypeUtils.cast(data, method.getReturnType());
             }

@@ -1,5 +1,8 @@
 package cn.zyszero.phoenix.rpc.demo.api;
 
+import java.util.List;
+import java.util.Map;
+
 public interface UserService {
     /**
      * @param id
@@ -29,4 +32,10 @@ public interface UserService {
     long[] getLongIds();
 
     int[] getIds(int[] ids);
+
+    List<User> getList(List<User> userList);
+
+    Map<String, User> getMap(Map<String, User> userMap);
+
+    Boolean getFlag(boolean flag);
 }
