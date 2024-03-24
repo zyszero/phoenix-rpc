@@ -1,7 +1,6 @@
 package cn.zyszero.phoenix.rpc.core.consumer;
 
-import cn.zyszero.phoenix.rpc.core.api.RpcRequest;
-import cn.zyszero.phoenix.rpc.core.api.RpcResponse;
+import cn.zyszero.phoenix.rpc.core.api.*;
 import cn.zyszero.phoenix.rpc.core.util.MethodUtils;
 import cn.zyszero.phoenix.rpc.core.util.TypeUtils;
 import com.alibaba.fastjson.JSON;
@@ -23,8 +22,14 @@ public class PhoenixInvocationHandler implements InvocationHandler {
 
     Class<?> service;
 
-    public PhoenixInvocationHandler(Class<?> service) {
+    RpcContext context;
+
+    List<String> providers;
+
+    public PhoenixInvocationHandler(Class<?> service, RpcContext context, List<String> providers) {
         this.service = service;
+        this.context = context;
+        this.providers = providers;
     }
 
     @Override
@@ -39,7 +44,10 @@ public class PhoenixInvocationHandler implements InvocationHandler {
         rpcRequest.setMethodSign(MethodUtils.methodSign(method));
         rpcRequest.setArgs(args);
 
-        RpcResponse rpcResponse = post(rpcRequest);
+        List<String> urls = context.getRouter().route(providers);
+        String url = (String) context.getLoadBalancer().choose(urls);
+        System.out.println("loadBalancer.choose(urls) ==> " + url);
+        RpcResponse rpcResponse = post(rpcRequest, url);
 
         if (rpcResponse.isStatues()) {
             Object data = rpcResponse.getData();
@@ -103,11 +111,11 @@ public class PhoenixInvocationHandler implements InvocationHandler {
             .connectTimeout(1, TimeUnit.SECONDS)
             .build();
 
-    private RpcResponse post(RpcRequest rpcRequest) {
+    private RpcResponse post(RpcRequest rpcRequest, String url) {
         String reqJson = JSON.toJSONString(rpcRequest);
         System.out.println("reqJson: " + reqJson);
         Request request = new Request.Builder()
-                .url("http://localhost:8080/rpc")
+                .url(url)
                 .post(RequestBody.create(reqJson, JSON_TYPE))
                 .build();
         try {

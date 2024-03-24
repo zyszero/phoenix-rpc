@@ -1,2 +1,6 @@
 server:
-  port: 8081
+  port: 8080
+
+phoenix:
+  rpc:
+    providers: "http://localhost:8081/rpc, http://localhost:8083/rpc"

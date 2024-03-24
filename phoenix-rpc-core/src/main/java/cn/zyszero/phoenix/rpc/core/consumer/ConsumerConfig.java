@@ -1,5 +1,9 @@
 package cn.zyszero.phoenix.rpc.core.consumer;
 
+import cn.zyszero.phoenix.rpc.core.api.LoadBalancer;
+import cn.zyszero.phoenix.rpc.core.api.Router;
+import cn.zyszero.phoenix.rpc.core.cluster.RandomLoadBalancer;
+import cn.zyszero.phoenix.rpc.core.cluster.RoundRibonLoadBalancer;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,5 +25,16 @@ public class ConsumerConfig {
             consumerBootstrap.start();
             System.out.println("consumerBootstrapRunner started");
         };
+    }
+
+
+    @Bean
+    public LoadBalancer loadBalancer() {
+        return new RoundRibonLoadBalancer();
+    }
+
+    @Bean
+    public Router route() {
+        return Router.DEFAULT;
     }
 }

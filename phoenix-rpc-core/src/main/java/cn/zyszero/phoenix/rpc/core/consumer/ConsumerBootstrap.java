@@ -1,9 +1,14 @@
 package cn.zyszero.phoenix.rpc.core.consumer;
 
 import cn.zyszero.phoenix.rpc.core.annotation.PhoenixConsumer;
+import cn.zyszero.phoenix.rpc.core.api.LoadBalancer;
+import cn.zyszero.phoenix.rpc.core.api.Router;
+import cn.zyszero.phoenix.rpc.core.api.RpcContext;
 import lombok.Data;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.core.env.Environment;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
@@ -13,15 +18,30 @@ import java.util.List;
 import java.util.Map;
 
 @Data
-public class ConsumerBootstrap implements ApplicationContextAware {
+public class ConsumerBootstrap implements ApplicationContextAware, EnvironmentAware {
 
     ApplicationContext applicationContext;
 
+    Environment environment;
 
     private Map<String, Object> stub = new HashMap<>();
 
 
     public void start() {
+
+        Router router = applicationContext.getBean(Router.class);
+        LoadBalancer loadBalancer = applicationContext.getBean(LoadBalancer.class);
+
+        RpcContext rpcContext = new RpcContext();
+        rpcContext.setRouter(router);
+        rpcContext.setLoadBalancer(loadBalancer);
+
+
+        String url = environment.getProperty("phoenix.rpc.providers", "");
+        String[] providers = url.split(",");
+        if (providers.length == 0) {
+            throw new RuntimeException("phoenix.rpc.providers is empty");
+        }
         // 1. 获取所有的 bean definition name
         String[] names = applicationContext.getBeanDefinitionNames();
         for (String name : names) {
@@ -39,7 +59,7 @@ public class ConsumerBootstrap implements ApplicationContextAware {
                         // 3.1 生成代理对象
                         if (consumer == null) {
                             // 3.1 生成代理对象
-                            consumer = createConsumer(service);
+                            consumer = createConsumer(service, rpcContext, List.of(providers));
                         }
                         field.setAccessible(true);
                         field.set(bean, consumer);
@@ -51,9 +71,9 @@ public class ConsumerBootstrap implements ApplicationContextAware {
         }
     }
 
-    private Object createConsumer(Class<?> service) {
+    private Object createConsumer(Class<?> service, RpcContext context, List<String> providers) {
         // JDK 动态代理
-        return Proxy.newProxyInstance(service.getClassLoader(), new Class[]{service}, new PhoenixInvocationHandler(service));
+        return Proxy.newProxyInstance(service.getClassLoader(), new Class[]{service}, new PhoenixInvocationHandler(service, context, providers));
     }
 
     private List<Field> findAnnotatedFields(Class<?> aClass) {
@@ -69,4 +89,6 @@ public class ConsumerBootstrap implements ApplicationContextAware {
         }
         return result;
     }
+
+
 }

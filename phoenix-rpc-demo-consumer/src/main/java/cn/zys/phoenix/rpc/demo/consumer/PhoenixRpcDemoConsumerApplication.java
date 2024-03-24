@@ -11,6 +11,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.sql.SQLOutput;
 import java.util.List;
@@ -18,6 +22,7 @@ import java.util.Map;
 
 @SpringBootApplication
 @Import({ConsumerConfig.class})
+@RestController
 public class PhoenixRpcDemoConsumerApplication {
 
     @PhoenixConsumer
@@ -25,6 +30,11 @@ public class PhoenixRpcDemoConsumerApplication {
 
     @PhoenixConsumer
     OrderService orderService;
+
+    @GetMapping("/user")
+    public User findBy(int id) {
+        return userService.findById(id);
+    }
 
     public static void main(String[] args) {
         SpringApplication.run(PhoenixRpcDemoConsumerApplication.class, args);

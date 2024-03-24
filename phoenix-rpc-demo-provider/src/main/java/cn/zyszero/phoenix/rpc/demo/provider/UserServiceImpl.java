@@ -3,6 +3,9 @@ package cn.zyszero.phoenix.rpc.demo.provider;
 import cn.zyszero.phoenix.rpc.core.annotation.PhoenixProvider;
 import cn.zyszero.phoenix.rpc.demo.api.User;
 import cn.zyszero.phoenix.rpc.demo.api.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -11,14 +14,22 @@ import java.util.Map;
 @Component
 @PhoenixProvider
 public class UserServiceImpl implements UserService {
+
+    @Autowired
+    private Environment environment;
+
     @Override
     public User findById(int id) {
-        return new User(id, "ZZ-" + System.currentTimeMillis());
+        return new User(id, "ZZ-"
+                + environment.getProperty("server.port")
+                + "-" + System.currentTimeMillis());
     }
 
     @Override
     public User findById(int id, String name) {
-        return new User(id, "ZZ-" + System.currentTimeMillis() + "-" + name);
+        return new User(id, "ZZ-"
+                + environment.getProperty("server.port")
+                + System.currentTimeMillis() + "-" + name);
     }
 
     @Override
@@ -43,7 +54,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String getName(int id) {
-        return "KK-" + id;
+        return "ZZ-"
+                + environment.getProperty("server.port")
+                + "-" + id;
     }
 
     @Override
