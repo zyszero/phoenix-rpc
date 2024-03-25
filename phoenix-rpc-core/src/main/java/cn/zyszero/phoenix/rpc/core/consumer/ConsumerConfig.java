@@ -27,9 +27,9 @@ public class ConsumerConfig {
     @Order(Integer.MIN_VALUE)
     public ApplicationRunner consumerBootstrapRunner(ConsumerBootstrap consumerBootstrap) {
         return args -> {
-            System.out.println("consumerBootstrapRunner starting...");
+            System.out.println("consumerBootstrapRunner starting ...");
             consumerBootstrap.start();
-            System.out.println("consumerBootstrapRunner started");
+            System.out.println("consumerBootstrapRunner started ...");
         };
     }
 
