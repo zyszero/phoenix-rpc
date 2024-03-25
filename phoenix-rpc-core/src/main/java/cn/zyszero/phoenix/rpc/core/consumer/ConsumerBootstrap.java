@@ -2,6 +2,7 @@ package cn.zyszero.phoenix.rpc.core.consumer;
 
 import cn.zyszero.phoenix.rpc.core.annotation.PhoenixConsumer;
 import cn.zyszero.phoenix.rpc.core.api.LoadBalancer;
+import cn.zyszero.phoenix.rpc.core.api.RegistryCenter;
 import cn.zyszero.phoenix.rpc.core.api.Router;
 import cn.zyszero.phoenix.rpc.core.api.RpcContext;
 import lombok.Data;
@@ -31,17 +32,12 @@ public class ConsumerBootstrap implements ApplicationContextAware, EnvironmentAw
 
         Router router = applicationContext.getBean(Router.class);
         LoadBalancer loadBalancer = applicationContext.getBean(LoadBalancer.class);
+        RegistryCenter registryCenter = applicationContext.getBean(RegistryCenter.class);
 
         RpcContext rpcContext = new RpcContext();
         rpcContext.setRouter(router);
         rpcContext.setLoadBalancer(loadBalancer);
 
-
-        String url = environment.getProperty("phoenix.rpc.providers", "");
-        String[] providers = url.split(",");
-        if (providers.length == 0) {
-            throw new RuntimeException("phoenix.rpc.providers is empty");
-        }
         // 1. 获取所有的 bean definition name
         String[] names = applicationContext.getBeanDefinitionNames();
         for (String name : names) {
@@ -59,7 +55,7 @@ public class ConsumerBootstrap implements ApplicationContextAware, EnvironmentAw
                         // 3.1 生成代理对象
                         if (consumer == null) {
                             // 3.1 生成代理对象
-                            consumer = createConsumer(service, rpcContext, List.of(providers));
+                            consumer = createConsumerFromRegistry(service, rpcContext, registryCenter);
                         }
                         field.setAccessible(true);
                         field.set(bean, consumer);
@@ -69,6 +65,12 @@ public class ConsumerBootstrap implements ApplicationContextAware, EnvironmentAw
                 }
             });
         }
+    }
+
+    private Object createConsumerFromRegistry(Class<?> service, RpcContext context, RegistryCenter registryCenter) {
+        String serviceName = service.getCanonicalName();
+        List<String> providers = registryCenter.fetchAll(serviceName);
+        return createConsumer(service, context, providers);
     }
 
     private Object createConsumer(Class<?> service, RpcContext context, List<String> providers) {
