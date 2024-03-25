@@ -2,7 +2,6 @@ package cn.zys.phoenix.rpc.demo.consumer;
 
 import cn.zyszero.phoenix.rpc.core.annotation.PhoenixConsumer;
 import cn.zyszero.phoenix.rpc.core.consumer.ConsumerConfig;
-import cn.zyszero.phoenix.rpc.demo.api.Order;
 import cn.zyszero.phoenix.rpc.demo.api.OrderService;
 import cn.zyszero.phoenix.rpc.demo.api.User;
 import cn.zyszero.phoenix.rpc.demo.api.UserService;
@@ -12,11 +11,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.sql.SQLOutput;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -111,6 +108,14 @@ public class PhoenixRpcDemoConsumerApplication {
             // 测试返回Boolean
             System.out.println("Case 13. >>===[测试参数和返回值都是Boolean/boolean类型]===");
             System.out.println("RPC result userService.getFlag(true) = " + userService.getFlag(true));
+
+
+            System.out.println("Case 14. >>===[测试参数和返回值都是User[]类型]===");
+            System.out.println("RPC result userService.findUsers(users): ");
+            User[] users = new User[]{
+                    new User(120, "zys120"),
+                    new User(121, "zys121")};
+            Arrays.stream(userService.findUsers(users)).forEach(System.out::println);
 
 //            Order order = orderService.findById(2);
 //            System.out.printf("order: %s\n", order);

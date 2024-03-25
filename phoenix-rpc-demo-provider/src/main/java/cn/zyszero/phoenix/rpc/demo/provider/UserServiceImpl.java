@@ -88,4 +88,9 @@ public class UserServiceImpl implements UserService {
     public Boolean getFlag(boolean flag) {
         return flag;
     }
+
+    @Override
+    public User[] findUsers(User[] users) {
+        return users;
+    }
 }
