@@ -4,6 +4,7 @@ import cn.zyszero.phoenix.rpc.core.api.LoadBalancer;
 import cn.zyszero.phoenix.rpc.core.api.RegistryCenter;
 import cn.zyszero.phoenix.rpc.core.api.Router;
 import cn.zyszero.phoenix.rpc.core.cluster.RoundRibonLoadBalancer;
+import cn.zyszero.phoenix.rpc.core.registry.ZookeeperRegistryCenter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
@@ -46,6 +47,6 @@ public class ConsumerConfig {
 
     @Bean(initMethod = "start", destroyMethod = "stop")
     public RegistryCenter consumer_rc() {
-        return new RegistryCenter.StaticRegistryCenter(List.of(services.split(",")));
+        return new ZookeeperRegistryCenter();
     }
 }

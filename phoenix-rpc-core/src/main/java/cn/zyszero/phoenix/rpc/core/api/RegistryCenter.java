@@ -1,5 +1,7 @@
 package cn.zyszero.phoenix.rpc.core.api;
 
+import cn.zyszero.phoenix.rpc.core.registry.ChangedListener;
+
 import java.util.List;
 
 /**
@@ -22,7 +24,7 @@ public interface RegistryCenter {
     // consumer 侧
     List<String> fetchAll(String service); // c
 
-    // void subscribe(); // c
+    void subscribe(String service, ChangedListener listener); // c
 
     // void heartbeat(); // c
 
@@ -57,6 +59,11 @@ public interface RegistryCenter {
         @Override
         public List<String> fetchAll(String service) {
             return providers;
+        }
+
+        @Override
+        public void subscribe(String service, ChangedListener listener) {
+
         }
     }
 }

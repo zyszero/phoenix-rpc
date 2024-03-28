@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Data
 public class ConsumerBootstrap implements ApplicationContextAware, EnvironmentAware {
@@ -69,8 +70,23 @@ public class ConsumerBootstrap implements ApplicationContextAware, EnvironmentAw
 
     private Object createConsumerFromRegistry(Class<?> service, RpcContext context, RegistryCenter registryCenter) {
         String serviceName = service.getCanonicalName();
-        List<String> providers = registryCenter.fetchAll(serviceName);
+        List<String> providers = mapUrls(registryCenter.fetchAll(serviceName));
+        System.out.println(" ===> map to providers: " + providers);
+        providers.forEach(System.out::println);
+
+        registryCenter.subscribe(serviceName, event -> {
+            providers.clear();
+            providers.addAll(mapUrls(event.getData()));
+        });
+
+
         return createConsumer(service, context, providers);
+    }
+
+    private List<String> mapUrls(List<String> nodes) {
+        return nodes.stream()
+                .map(node -> "http://" + node.replace("_", ":"))
+                .collect(Collectors.toList());
     }
 
     private Object createConsumer(Class<?> service, RpcContext context, List<String> providers) {

@@ -29,7 +29,7 @@ public class PhoenixRpcDemoProviderApplication {
 
     // 使用 HTTP + json 实现序列化和通信
 
-    @RequestMapping("/rpc")
+    @RequestMapping("/")
     public RpcResponse invoke(@RequestBody RpcRequest request) {
         return providerBootstrap.invoke(request);
     }

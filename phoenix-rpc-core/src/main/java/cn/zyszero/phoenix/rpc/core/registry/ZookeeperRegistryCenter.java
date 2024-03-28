@@ -1,9 +1,11 @@
 package cn.zyszero.phoenix.rpc.core.registry;
 
 import cn.zyszero.phoenix.rpc.core.api.RegistryCenter;
+import lombok.SneakyThrows;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.recipes.cache.TreeCache;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
 
@@ -72,6 +74,33 @@ public class ZookeeperRegistryCenter implements RegistryCenter {
 
     @Override
     public List<String> fetchAll(String service) {
-        return null;
+        String servicePath = "/" + service;
+        try {
+            // 获取所有子节点
+            System.out.println(" ===> fetch all instance nodes from zk: " + servicePath);
+            List<String> nodes = client.getChildren().forPath(servicePath);
+            nodes.forEach(System.out::println);
+            return nodes;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public void subscribe(String service, ChangedListener listener) {
+        // 将 zk 的变化，转化为 provider 列表的变化
+        String servicePath = "/" + service;
+        final TreeCache cache = TreeCache.newBuilder(client, servicePath)
+                .setCacheData(true)
+                .setMaxDepth(2)
+                .build();
+        cache.getListenable().addListener((curator, event) -> {
+            // 有任何节点变动，这里都会触发
+            System.out.println("zk subscribe event: " + event);
+            List<String> nodes = fetchAll(service);
+            listener.fire(new Event(nodes));
+        });
+        cache.start();
     }
 }
