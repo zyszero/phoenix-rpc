@@ -26,7 +26,7 @@ public class ProviderBootstrap implements ApplicationContextAware {
 
     private MultiValueMap<String, ProviderMeta> skeleton = new LinkedMultiValueMap<>();
 
-    @PostConstruct
+    @PostConstruct // init-method
     public void start() {
         Map<String, Object> providers = applicationContext.getBeansWithAnnotation(PhoenixProvider.class);
         providers.forEach((k, v) -> System.out.println("provider: " + k + " -> " + v));

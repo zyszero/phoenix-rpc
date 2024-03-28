@@ -8,22 +8,23 @@ import java.util.List;
  */
 public interface RegistryCenter {
 
-    void start();
+    void start(); // p/c
 
-    void stop();
+    void stop(); // p/c
 
 
     // provider 侧
-    void register(String service, String instance);
+    void register(String service, String instance); // p
 
-    void unregister(String service, String instance);
+    void unregister(String service, String instance); // p
 
 
     // consumer 侧
-    List<String> fetchAll(String service);
+    List<String> fetchAll(String service); // c
 
-    // void subscribe();
+    // void subscribe(); // c
 
+    // void heartbeat(); // c
 
     class StaticRegistryCenter implements RegistryCenter {
 
