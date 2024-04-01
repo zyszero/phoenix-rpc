@@ -5,6 +5,7 @@ import cn.zyszero.phoenix.rpc.core.api.LoadBalancer;
 import cn.zyszero.phoenix.rpc.core.api.RegistryCenter;
 import cn.zyszero.phoenix.rpc.core.api.Router;
 import cn.zyszero.phoenix.rpc.core.api.RpcContext;
+import cn.zyszero.phoenix.rpc.core.util.MethodUtils;
 import lombok.Data;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -44,7 +45,7 @@ public class ConsumerBootstrap implements ApplicationContextAware, EnvironmentAw
         for (String name : names) {
             Object bean = applicationContext.getBean(name);
             // 2 找到所有的带有 @PhoenixConsumer 注解的字段
-            List<Field> fields = findAnnotatedFields(bean.getClass());
+            List<Field> fields = MethodUtils.findAnnotatedFields(bean.getClass(), PhoenixConsumer.class);
 
             // 3. 生成代理对象
             fields.forEach(field -> {
@@ -94,19 +95,6 @@ public class ConsumerBootstrap implements ApplicationContextAware, EnvironmentAw
         return Proxy.newProxyInstance(service.getClassLoader(), new Class[]{service}, new PhoenixInvocationHandler(service, context, providers));
     }
 
-    private List<Field> findAnnotatedFields(Class<?> aClass) {
-        List<Field> result = new ArrayList<>();
-        while (aClass != null) {
-            Field[] fields = aClass.getDeclaredFields();
-            for (Field field : fields) {
-                if (field.isAnnotationPresent(PhoenixConsumer.class)) {
-                    result.add(field);
-                }
-            }
-            aClass = aClass.getSuperclass();
-        }
-        return result;
-    }
 
 
 }

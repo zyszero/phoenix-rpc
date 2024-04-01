@@ -1,7 +1,13 @@
 package cn.zyszero.phoenix.rpc.core.util;
 
+import cn.zyszero.phoenix.rpc.core.annotation.PhoenixConsumer;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class MethodUtils {
 
@@ -26,6 +32,21 @@ public class MethodUtils {
         Arrays.stream(method.getParameterTypes()).forEach(
                 c -> sb.append("_").append(c.getCanonicalName()));
         return sb.toString();
+    }
+
+
+    public static List<Field> findAnnotatedFields(Class<?> aClass, Class<? extends Annotation> annotationClass) {
+        List<Field> result = new ArrayList<>();
+        while (aClass != null) {
+            Field[] fields = aClass.getDeclaredFields();
+            for (Field field : fields) {
+                if (field.isAnnotationPresent(annotationClass)) {
+                    result.add(field);
+                }
+            }
+            aClass = aClass.getSuperclass();
+        }
+        return result;
     }
 
 
