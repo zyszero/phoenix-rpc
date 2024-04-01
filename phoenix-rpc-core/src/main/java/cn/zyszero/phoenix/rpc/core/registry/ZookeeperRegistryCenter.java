@@ -2,6 +2,7 @@ package cn.zyszero.phoenix.rpc.core.registry;
 
 import cn.zyszero.phoenix.rpc.core.api.RegistryCenter;
 import cn.zyszero.phoenix.rpc.core.meta.InstanceMeta;
+import cn.zyszero.phoenix.rpc.core.meta.ServiceMeta;
 import lombok.SneakyThrows;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
@@ -41,8 +42,8 @@ public class ZookeeperRegistryCenter implements RegistryCenter {
     }
 
     @Override
-    public void register(String service, InstanceMeta instance) {
-        String servicePath = "/" + service;
+    public void register(ServiceMeta service, InstanceMeta instance) {
+        String servicePath = "/" + service.toPath();
         try {
             // 创建服务的持久化节点
             if (client.checkExists().forPath(servicePath) == null) {
@@ -59,8 +60,8 @@ public class ZookeeperRegistryCenter implements RegistryCenter {
     }
 
     @Override
-    public void unregister(String service, InstanceMeta instance) {
-        String servicePath = "/" + service;
+    public void unregister(ServiceMeta service, InstanceMeta instance) {
+        String servicePath = "/" + service.toPath();
         try {
             // 判断服务节点是否存在
             if (client.checkExists().forPath(servicePath) == null) {
@@ -76,8 +77,8 @@ public class ZookeeperRegistryCenter implements RegistryCenter {
     }
 
     @Override
-    public List<InstanceMeta> fetchAll(String service) {
-        String servicePath = "/" + service;
+    public List<InstanceMeta> fetchAll(ServiceMeta service) {
+        String servicePath = "/" + service.toPath();
         try {
             // 获取所有子节点
             System.out.println(" ===> fetch all instance nodes from zk: " + servicePath);
@@ -101,9 +102,9 @@ public class ZookeeperRegistryCenter implements RegistryCenter {
 
     @SneakyThrows
     @Override
-    public void subscribe(String service, ChangedListener listener) {
+    public void subscribe(ServiceMeta service, ChangedListener listener) {
         // 将 zk 的变化，转化为 provider 列表的变化
-        String servicePath = "/" + service;
+        String servicePath = "/" + service.toPath();
         final TreeCache cache = TreeCache.newBuilder(client, servicePath)
                 .setCacheData(true)
                 .setMaxDepth(2)

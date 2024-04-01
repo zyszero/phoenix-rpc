@@ -6,6 +6,7 @@ import cn.zyszero.phoenix.rpc.core.api.RpcRequest;
 import cn.zyszero.phoenix.rpc.core.api.RpcResponse;
 import cn.zyszero.phoenix.rpc.core.meta.InstanceMeta;
 import cn.zyszero.phoenix.rpc.core.meta.ProviderMeta;
+import cn.zyszero.phoenix.rpc.core.meta.ServiceMeta;
 import cn.zyszero.phoenix.rpc.core.util.MethodUtils;
 import cn.zyszero.phoenix.rpc.core.util.TypeUtils;
 import jakarta.annotation.PostConstruct;
@@ -43,6 +44,15 @@ public class ProviderBootstrap implements ApplicationContextAware {
     @Value("${server.port}")
     private String port;
 
+    @Value("${app.id}")
+    private String app;
+
+    @Value("${app.namespace}")
+    private String namespace;
+
+    @Value("${app.env}")
+    private String env;
+
 
     private RegistryCenter registryCenter;
 
@@ -70,11 +80,23 @@ public class ProviderBootstrap implements ApplicationContextAware {
     }
 
     private void registerService(String service) {
-        registryCenter.register(service, instance);
+        ServiceMeta serviceMeta = ServiceMeta.builder()
+                .name(service)
+                .app(app)
+                .namespace(namespace)
+                .env(env)
+                .build();
+        registryCenter.register(serviceMeta, instance);
     }
 
     private void unregisterService(String service) {
-        registryCenter.unregister(service, instance);
+        ServiceMeta serviceMeta = ServiceMeta.builder()
+                .name(service)
+                .app(app)
+                .namespace(namespace)
+                .env(env)
+                .build();
+        registryCenter.unregister(serviceMeta, instance);
     }
 
 
@@ -100,8 +122,6 @@ public class ProviderBootstrap implements ApplicationContextAware {
         System.out.println("create provider: " + meta);
         skeleton.add(i.getCanonicalName(), meta);
     }
-
-
 
 
 }

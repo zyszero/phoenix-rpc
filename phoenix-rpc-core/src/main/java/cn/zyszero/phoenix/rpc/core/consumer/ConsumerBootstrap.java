@@ -6,8 +6,10 @@ import cn.zyszero.phoenix.rpc.core.api.RegistryCenter;
 import cn.zyszero.phoenix.rpc.core.api.Router;
 import cn.zyszero.phoenix.rpc.core.api.RpcContext;
 import cn.zyszero.phoenix.rpc.core.meta.InstanceMeta;
+import cn.zyszero.phoenix.rpc.core.meta.ServiceMeta;
 import cn.zyszero.phoenix.rpc.core.util.MethodUtils;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.EnvironmentAware;
@@ -36,10 +38,20 @@ public class ConsumerBootstrap implements ApplicationContextAware, EnvironmentAw
     private Map<String, Object> stub = new HashMap<>();
 
 
+    @Value("${app.id}")
+    private String app;
+
+    @Value("${app.namespace}")
+    private String namespace;
+
+    @Value("${app.env}")
+    private String env;
+
+
     public void start() {
 
-        Router router = applicationContext.getBean(Router.class);
-        LoadBalancer loadBalancer = applicationContext.getBean(LoadBalancer.class);
+        Router<InstanceMeta> router = applicationContext.getBean(Router.class);
+        LoadBalancer<InstanceMeta> loadBalancer = applicationContext.getBean(LoadBalancer.class);
         RegistryCenter registryCenter = applicationContext.getBean(RegistryCenter.class);
         HttpInvoker httpInvoker = applicationContext.getBean(HttpInvoker.class);
 
@@ -63,11 +75,8 @@ public class ConsumerBootstrap implements ApplicationContextAware, EnvironmentAw
                     Object consumer = stub.get(serviceName);
                     if (consumer == null) {
                         // 3.1 生成代理对象
-                        if (consumer == null) {
-                            // 3.1 生成代理对象
-                            consumer = createConsumerFromRegistry(service, rpcContext, registryCenter, httpInvoker);
-                            stub.put(serviceName, consumer);
-                        }
+                        consumer = createConsumerFromRegistry(service, rpcContext, registryCenter, httpInvoker);
+                        stub.put(serviceName, consumer);
                         field.setAccessible(true);
                         field.set(bean, consumer);
                     }
@@ -80,11 +89,17 @@ public class ConsumerBootstrap implements ApplicationContextAware, EnvironmentAw
 
     private Object createConsumerFromRegistry(Class<?> service, RpcContext context, RegistryCenter registryCenter, HttpInvoker httpInvoker) {
         String serviceName = service.getCanonicalName();
-        List<InstanceMeta> providers = registryCenter.fetchAll(serviceName);
+        ServiceMeta serviceMeta = ServiceMeta.builder()
+                .app(app)
+                .namespace(namespace)
+                .env(env)
+                .name(serviceName)
+                .build();
+        List<InstanceMeta> providers = registryCenter.fetchAll(serviceMeta);
         System.out.println(" ===> map to providers: " + providers);
         providers.forEach(System.out::println);
 
-        registryCenter.subscribe(serviceName, event -> {
+        registryCenter.subscribe(serviceMeta, event -> {
             providers.clear();
             providers.addAll(event.getData());
         });

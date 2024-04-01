@@ -5,6 +5,8 @@ import lombok.Data;
 import java.lang.reflect.Method;
 
 /**
+ * 描述 Provider 的映射关系。
+ *
  * @author zyszero
  * @create: 2024/3/13
  */
