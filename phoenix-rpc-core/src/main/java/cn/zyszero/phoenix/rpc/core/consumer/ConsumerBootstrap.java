@@ -14,12 +14,18 @@ import org.springframework.core.env.Environment;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+
+/**
+ * 消费端的启动类.
+ *
+ * @Author : zyszero
+ * @Date: 2024/4/1 21:10
+ */
 @Data
 public class ConsumerBootstrap implements ApplicationContextAware, EnvironmentAware {
 
@@ -35,6 +41,7 @@ public class ConsumerBootstrap implements ApplicationContextAware, EnvironmentAw
         Router router = applicationContext.getBean(Router.class);
         LoadBalancer loadBalancer = applicationContext.getBean(LoadBalancer.class);
         RegistryCenter registryCenter = applicationContext.getBean(RegistryCenter.class);
+        HttpInvoker httpInvoker = applicationContext.getBean(HttpInvoker.class);
 
         RpcContext rpcContext = new RpcContext();
         rpcContext.setRouter(router);
@@ -57,7 +64,7 @@ public class ConsumerBootstrap implements ApplicationContextAware, EnvironmentAw
                         // 3.1 生成代理对象
                         if (consumer == null) {
                             // 3.1 生成代理对象
-                            consumer = createConsumerFromRegistry(service, rpcContext, registryCenter);
+                            consumer = createConsumerFromRegistry(service, rpcContext, registryCenter, httpInvoker);
                         }
                         field.setAccessible(true);
                         field.set(bean, consumer);
@@ -69,7 +76,7 @@ public class ConsumerBootstrap implements ApplicationContextAware, EnvironmentAw
         }
     }
 
-    private Object createConsumerFromRegistry(Class<?> service, RpcContext context, RegistryCenter registryCenter) {
+    private Object createConsumerFromRegistry(Class<?> service, RpcContext context, RegistryCenter registryCenter, HttpInvoker httpInvoker) {
         String serviceName = service.getCanonicalName();
         List<String> providers = mapUrls(registryCenter.fetchAll(serviceName));
         System.out.println(" ===> map to providers: " + providers);
@@ -81,7 +88,7 @@ public class ConsumerBootstrap implements ApplicationContextAware, EnvironmentAw
         });
 
 
-        return createConsumer(service, context, providers);
+        return createConsumer(service, context, providers, httpInvoker);
     }
 
     private List<String> mapUrls(List<String> nodes) {
@@ -90,11 +97,11 @@ public class ConsumerBootstrap implements ApplicationContextAware, EnvironmentAw
                 .collect(Collectors.toList());
     }
 
-    private Object createConsumer(Class<?> service, RpcContext context, List<String> providers) {
+    private Object createConsumer(Class<?> service, RpcContext context, List<String> providers, HttpInvoker httpInvoker) {
         // JDK 动态代理
-        return Proxy.newProxyInstance(service.getClassLoader(), new Class[]{service}, new PhoenixInvocationHandler(service, context, providers));
+        return Proxy.newProxyInstance(service.getClassLoader(), new Class[]{service},
+                new PhoenixInvocationHandler(service, context, providers, httpInvoker));
     }
-
 
 
 }

@@ -4,14 +4,13 @@ import cn.zyszero.phoenix.rpc.core.api.LoadBalancer;
 import cn.zyszero.phoenix.rpc.core.api.RegistryCenter;
 import cn.zyszero.phoenix.rpc.core.api.Router;
 import cn.zyszero.phoenix.rpc.core.cluster.RoundRibonLoadBalancer;
+import cn.zyszero.phoenix.rpc.core.consumer.http.OkHttpInvoker;
 import cn.zyszero.phoenix.rpc.core.registry.ZookeeperRegistryCenter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-
-import java.util.List;
 
 @Configuration
 public class ConsumerConfig {
@@ -48,5 +47,10 @@ public class ConsumerConfig {
     @Bean(initMethod = "start", destroyMethod = "stop")
     public RegistryCenter consumer_rc() {
         return new ZookeeperRegistryCenter();
+    }
+
+    @Bean
+    public HttpInvoker httpInvoker() {
+        return new OkHttpInvoker();
     }
 }
