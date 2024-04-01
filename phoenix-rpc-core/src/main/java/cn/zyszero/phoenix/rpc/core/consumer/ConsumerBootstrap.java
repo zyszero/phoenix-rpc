@@ -65,6 +65,7 @@ public class ConsumerBootstrap implements ApplicationContextAware, EnvironmentAw
                         if (consumer == null) {
                             // 3.1 生成代理对象
                             consumer = createConsumerFromRegistry(service, rpcContext, registryCenter, httpInvoker);
+                            stub.put(serviceName, consumer);
                         }
                         field.setAccessible(true);
                         field.set(bean, consumer);
