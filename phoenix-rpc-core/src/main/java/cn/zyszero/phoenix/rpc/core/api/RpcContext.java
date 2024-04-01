@@ -1,5 +1,6 @@
 package cn.zyszero.phoenix.rpc.core.api;
 
+import cn.zyszero.phoenix.rpc.core.meta.InstanceMeta;
 import lombok.Data;
 
 import java.util.List;
@@ -14,7 +15,7 @@ public class RpcContext {
     private List<Filter> filters;
 
 
-    private Router router;
+    private Router<InstanceMeta> router;
 
-    private LoadBalancer loadBalancer;
+    private LoadBalancer<InstanceMeta> loadBalancer;
 }

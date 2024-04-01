@@ -3,6 +3,7 @@ package cn.zyszero.phoenix.rpc.core.consumer;
 import cn.zyszero.phoenix.rpc.core.api.RpcContext;
 import cn.zyszero.phoenix.rpc.core.api.RpcRequest;
 import cn.zyszero.phoenix.rpc.core.api.RpcResponse;
+import cn.zyszero.phoenix.rpc.core.meta.InstanceMeta;
 import cn.zyszero.phoenix.rpc.core.util.MethodUtils;
 import cn.zyszero.phoenix.rpc.core.util.TypeUtils;
 
@@ -22,11 +23,11 @@ public class PhoenixInvocationHandler implements InvocationHandler {
 
     RpcContext context;
 
-    List<String> providers;
+    List<InstanceMeta> providers;
 
     HttpInvoker httpInvoker;
 
-    public PhoenixInvocationHandler(Class<?> service, RpcContext context, List<String> providers, HttpInvoker httpInvoker) {
+    public PhoenixInvocationHandler(Class<?> service, RpcContext context, List<InstanceMeta> providers, HttpInvoker httpInvoker) {
         this.service = service;
         this.context = context;
         this.providers = providers;
@@ -34,7 +35,6 @@ public class PhoenixInvocationHandler implements InvocationHandler {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (MethodUtils.checkLocalMethod(method)) {
             return null;
@@ -46,10 +46,12 @@ public class PhoenixInvocationHandler implements InvocationHandler {
         rpcRequest.setMethodSign(MethodUtils.methodSign(method));
         rpcRequest.setArgs(args);
 
-        List<String> urls = context.getRouter().route(providers);
-        String url = (String) context.getLoadBalancer().choose(urls);
-        System.out.println("loadBalancer.choose(urls) ==> " + url);
-        RpcResponse<?> rpcResponse = httpInvoker.post(rpcRequest, url);
+        List<InstanceMeta> instances = context.getRouter().route(providers);
+        InstanceMeta instance = context.getLoadBalancer().choose(instances);
+        System.out.println("loadBalancer.choose(instance) ==> " + instance);
+
+
+        RpcResponse<?> rpcResponse = httpInvoker.post(rpcRequest, instance.toString());
 
         if (rpcResponse.isStatues()) {
             Object data = rpcResponse.getData();

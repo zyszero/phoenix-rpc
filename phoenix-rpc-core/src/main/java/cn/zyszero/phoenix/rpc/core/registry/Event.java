@@ -1,5 +1,6 @@
 package cn.zyszero.phoenix.rpc.core.registry;
 
+import cn.zyszero.phoenix.rpc.core.meta.InstanceMeta;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -12,5 +13,5 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class Event {
-    private List<String> data;
+    private List<InstanceMeta> data;
 }

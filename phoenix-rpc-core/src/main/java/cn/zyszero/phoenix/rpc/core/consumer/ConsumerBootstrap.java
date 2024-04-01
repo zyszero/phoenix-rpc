@@ -5,6 +5,7 @@ import cn.zyszero.phoenix.rpc.core.api.LoadBalancer;
 import cn.zyszero.phoenix.rpc.core.api.RegistryCenter;
 import cn.zyszero.phoenix.rpc.core.api.Router;
 import cn.zyszero.phoenix.rpc.core.api.RpcContext;
+import cn.zyszero.phoenix.rpc.core.meta.InstanceMeta;
 import cn.zyszero.phoenix.rpc.core.util.MethodUtils;
 import lombok.Data;
 import org.springframework.context.ApplicationContext;
@@ -17,7 +18,6 @@ import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 
 /**
@@ -56,6 +56,7 @@ public class ConsumerBootstrap implements ApplicationContextAware, EnvironmentAw
 
             // 3. 生成代理对象
             fields.forEach(field -> {
+                System.out.println(" ===> field: " + field.getName());
                 try {
                     Class<?> service = field.getType();
                     String serviceName = service.getCanonicalName();
@@ -79,26 +80,21 @@ public class ConsumerBootstrap implements ApplicationContextAware, EnvironmentAw
 
     private Object createConsumerFromRegistry(Class<?> service, RpcContext context, RegistryCenter registryCenter, HttpInvoker httpInvoker) {
         String serviceName = service.getCanonicalName();
-        List<String> providers = mapUrls(registryCenter.fetchAll(serviceName));
+        List<InstanceMeta> providers = registryCenter.fetchAll(serviceName);
         System.out.println(" ===> map to providers: " + providers);
         providers.forEach(System.out::println);
 
         registryCenter.subscribe(serviceName, event -> {
             providers.clear();
-            providers.addAll(mapUrls(event.getData()));
+            providers.addAll(event.getData());
         });
 
 
         return createConsumer(service, context, providers, httpInvoker);
     }
 
-    private List<String> mapUrls(List<String> nodes) {
-        return nodes.stream()
-                .map(node -> "http://" + node.replace("_", ":"))
-                .collect(Collectors.toList());
-    }
 
-    private Object createConsumer(Class<?> service, RpcContext context, List<String> providers, HttpInvoker httpInvoker) {
+    private Object createConsumer(Class<?> service, RpcContext context, List<InstanceMeta> providers, HttpInvoker httpInvoker) {
         // JDK 动态代理
         return Proxy.newProxyInstance(service.getClassLoader(), new Class[]{service},
                 new PhoenixInvocationHandler(service, context, providers, httpInvoker));
