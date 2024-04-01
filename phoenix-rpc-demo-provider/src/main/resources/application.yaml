@@ -2,6 +2,13 @@ server:
   port: 8081
 
 
+phoenix:
+  rpc:
+    registry:
+      zookeeper:
+        server: 192.168.200.61:2181
+        root: phoenix-rpc
+
 app:
   id: app1
   namespace: public

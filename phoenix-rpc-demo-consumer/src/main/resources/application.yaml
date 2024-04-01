@@ -4,6 +4,11 @@ server:
 phoenix:
   rpc:
     providers: "http://localhost:8081/,http://localhost:8082/,http://localhost:8083/"
+    registry:
+      zookeeper:
+        server: 192.168.200.61:2181
+        root: phoenix-rpc
+
 
 app:
   id: app1
