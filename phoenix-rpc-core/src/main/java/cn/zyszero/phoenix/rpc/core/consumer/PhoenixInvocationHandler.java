@@ -51,7 +51,7 @@ public class PhoenixInvocationHandler implements InvocationHandler {
         System.out.println("loadBalancer.choose(instance) ==> " + instance);
 
 
-        RpcResponse<?> rpcResponse = httpInvoker.post(rpcRequest, instance.toString());
+        RpcResponse<?> rpcResponse = httpInvoker.post(rpcRequest, instance.toUrl());
 
         if (rpcResponse.isStatues()) {
             Object data = rpcResponse.getData();
