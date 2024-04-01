@@ -4,6 +4,7 @@ import cn.zyszero.phoenix.rpc.core.api.RpcRequest;
 import cn.zyszero.phoenix.rpc.core.api.RpcResponse;
 import cn.zyszero.phoenix.rpc.core.provider.ProviderBootstrap;
 import cn.zyszero.phoenix.rpc.core.provider.ProviderConfig;
+import cn.zyszero.phoenix.rpc.core.provider.ProviderInvoker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
@@ -25,13 +26,13 @@ public class PhoenixRpcDemoProviderApplication {
 
 
     @Autowired
-    private ProviderBootstrap providerBootstrap;
+    private ProviderInvoker providerInvoker;
 
     // 使用 HTTP + json 实现序列化和通信
 
     @RequestMapping("/")
-    public RpcResponse invoke(@RequestBody RpcRequest request) {
-        return providerBootstrap.invoke(request);
+    public RpcResponse<Object> invoke(@RequestBody RpcRequest request) {
+        return providerInvoker.invoke(request);
     }
 
 

@@ -42,32 +42,37 @@ public class ProviderBootstrap implements ApplicationContextAware {
     @Value("${server.port}")
     private String port;
 
+
+    private RegistryCenter registryCenter;
+
     @PostConstruct // init-method
     public void init() {
         Map<String, Object> providers = applicationContext.getBeansWithAnnotation(PhoenixProvider.class);
         providers.forEach((k, v) -> System.out.println("provider: " + k + " -> " + v));
         providers.values().forEach(this::generateInterface);
+        registryCenter = applicationContext.getBean(RegistryCenter.class);
     }
 
     @SneakyThrows
     public void start() {
         String ip = InetAddress.getLocalHost().getHostAddress();
         this.instance = ip + "_" + port;
+        registryCenter.start();
         skeleton.keySet().forEach(this::registerService);
     }
 
     @PreDestroy
     public void stop() {
+        System.out.println(" ===> unregister all stop. ");
         skeleton.keySet().forEach(this::unregisterService);
+        registryCenter.stop();
     }
 
     private void registerService(String service) {
-        RegistryCenter registryCenter = applicationContext.getBean(RegistryCenter.class);
         registryCenter.register(service, instance);
     }
 
     private void unregisterService(String service) {
-        RegistryCenter registryCenter = applicationContext.getBean(RegistryCenter.class);
         registryCenter.unregister(service, instance);
     }
 
@@ -95,37 +100,7 @@ public class ProviderBootstrap implements ApplicationContextAware {
         skeleton.add(i.getCanonicalName(), meta);
     }
 
-    public RpcResponse invoke(RpcRequest request) {
-        List<ProviderMeta> providerMetas = skeleton.get(request.getService());
-        try {
-            ProviderMeta meta = findProviderMeta(providerMetas, request.getMethodSign());
-            Method method = meta.getMethod();
-            Object[] args = processArgs(request.getArgs(), method.getParameterTypes());
-            Object result = method.invoke(meta.getServiceImpl(), args);
-            return new RpcResponse(true, result, null);
-        } catch (InvocationTargetException e) {
-            return new RpcResponse(false, null, new RuntimeException(e.getTargetException().getMessage()));
-        } catch (Exception e) {
-            return new RpcResponse(false, null, new RuntimeException(e.getMessage()));
-        }
-    }
 
-    private Object[] processArgs(Object[] args, Class<?>[] parameterTypes) {
-        if (args == null || args.length == 0) {
-            return args;
-        }
-        for (int i = 0; i < args.length; i++) {
-            args[i] = TypeUtils.cast(args[i], parameterTypes[i]);
-        }
-        return args;
-    }
-
-    private ProviderMeta findProviderMeta(List<ProviderMeta> providerMetas, String methodSign) {
-        return providerMetas.stream()
-                .filter(meta -> meta.getMethodSign().equals(methodSign))
-                .findFirst()
-                .orElse(null);
-    }
 
 
 }

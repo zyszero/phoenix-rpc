@@ -15,6 +15,12 @@ public class ProviderConfig {
         return new ProviderBootstrap();
     }
 
+
+    @Bean
+    public ProviderInvoker providerInvoker(ProviderBootstrap providerBootstrap) {
+        return new ProviderInvoker(providerBootstrap);
+    }
+
     @Bean
     @Order(Integer.MIN_VALUE)
     public ApplicationRunner providerBootstrap_runner(ProviderBootstrap providerBootstrap) {
@@ -26,7 +32,7 @@ public class ProviderConfig {
     }
 
 
-    @Bean(initMethod = "start", destroyMethod = "stop")
+    @Bean //(initMethod = "start", destroyMethod = "stop")
     public RegistryCenter provider_rc() {
         return new ZookeeperRegistryCenter();
     }
