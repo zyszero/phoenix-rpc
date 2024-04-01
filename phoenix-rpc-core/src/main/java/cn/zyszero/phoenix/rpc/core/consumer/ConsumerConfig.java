@@ -5,7 +5,8 @@ import cn.zyszero.phoenix.rpc.core.api.RegistryCenter;
 import cn.zyszero.phoenix.rpc.core.api.Router;
 import cn.zyszero.phoenix.rpc.core.cluster.RoundRibonLoadBalancer;
 import cn.zyszero.phoenix.rpc.core.consumer.http.OkHttpInvoker;
-import cn.zyszero.phoenix.rpc.core.registry.ZookeeperRegistryCenter;
+import cn.zyszero.phoenix.rpc.core.meta.InstanceMeta;
+import cn.zyszero.phoenix.rpc.core.registry.zk.ZookeeperRegistryCenter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
@@ -35,12 +36,13 @@ public class ConsumerConfig {
 
 
     @Bean
-    public LoadBalancer loadBalancer() {
-        return new RoundRibonLoadBalancer();
+    public LoadBalancer<InstanceMeta> loadBalancer() {
+        return new RoundRibonLoadBalancer<>();
     }
 
     @Bean
-    public Router route() {
+    @SuppressWarnings("unchecked")
+    public Router<InstanceMeta> route() {
         return Router.DEFAULT;
     }
 
