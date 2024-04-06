@@ -1,12 +1,14 @@
 package cn.zyszero.phoenix.rpc.core.api;
 
 import lombok.Data;
+import lombok.ToString;
 
 /**
  * @Author: zyszero
  * @create: 2020/12/13
  */
 @Data
+@ToString
 public class RpcRequest {
     /**
      * 接口

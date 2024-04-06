@@ -1,10 +1,7 @@
 package cn.zyszero.phoenix.rpc.core.consumer;
 
 import cn.zyszero.phoenix.rpc.core.annotation.PhoenixConsumer;
-import cn.zyszero.phoenix.rpc.core.api.LoadBalancer;
-import cn.zyszero.phoenix.rpc.core.api.RegistryCenter;
-import cn.zyszero.phoenix.rpc.core.api.Router;
-import cn.zyszero.phoenix.rpc.core.api.RpcContext;
+import cn.zyszero.phoenix.rpc.core.api.*;
 import cn.zyszero.phoenix.rpc.core.meta.InstanceMeta;
 import cn.zyszero.phoenix.rpc.core.meta.ServiceMeta;
 import cn.zyszero.phoenix.rpc.core.util.MethodUtils;
@@ -56,8 +53,11 @@ public class ConsumerBootstrap implements ApplicationContextAware, EnvironmentAw
         LoadBalancer<InstanceMeta> loadBalancer = applicationContext.getBean(LoadBalancer.class);
         RegistryCenter registryCenter = applicationContext.getBean(RegistryCenter.class);
         HttpInvoker httpInvoker = applicationContext.getBean(HttpInvoker.class);
+        List<Filter> filters = applicationContext.getBeansOfType(Filter.class).values().stream().toList();
+
 
         RpcContext rpcContext = new RpcContext();
+        rpcContext.setFilters(filters);
         rpcContext.setRouter(router);
         rpcContext.setLoadBalancer(loadBalancer);
 

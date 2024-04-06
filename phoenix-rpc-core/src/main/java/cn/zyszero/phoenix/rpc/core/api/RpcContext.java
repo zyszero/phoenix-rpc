@@ -14,7 +14,6 @@ public class RpcContext {
 
     private List<Filter> filters;
 
-
     private Router<InstanceMeta> router;
 
     private LoadBalancer<InstanceMeta> loadBalancer;
