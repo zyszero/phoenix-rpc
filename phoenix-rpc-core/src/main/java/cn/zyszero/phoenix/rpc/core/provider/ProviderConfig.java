@@ -2,11 +2,13 @@ package cn.zyszero.phoenix.rpc.core.provider;
 
 import cn.zyszero.phoenix.rpc.core.api.RegistryCenter;
 import cn.zyszero.phoenix.rpc.core.registry.zk.ZookeeperRegistryCenter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 
+@Slf4j
 @Configuration
 public class ProviderConfig {
     @Bean
@@ -24,9 +26,9 @@ public class ProviderConfig {
     @Order(Integer.MIN_VALUE)
     public ApplicationRunner providerBootstrap_runner(ProviderBootstrap providerBootstrap) {
         return args -> {
-            System.out.println("providerBootstrap starting ...");
+            log.info("providerBootstrap starting ...");
             providerBootstrap.start();
-            System.out.println("providerBootstrap started ...");
+            log.info("providerBootstrap started ...");
         };
     }
 

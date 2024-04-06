@@ -4,6 +4,7 @@ import cn.zyszero.phoenix.rpc.core.api.RpcResponse;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Array;
@@ -17,20 +18,21 @@ import java.util.*;
  * @Date: 2024/3/16 19:35
  * @Description:
  */
+@Slf4j
 public class TypeUtils {
 
     @Nullable
     public static Object castMethodResult(Method method, Object data) {
         Class<?> type = method.getReturnType();
-        System.out.println("method.getReturnType(): " + type);
+        log.debug("method.getReturnType(): " + type);
         if (data instanceof JSONObject jsonResult) {
             if (Map.class.isAssignableFrom(type)) {
                 Map resultMap = new HashMap<>();
                 Type genericReturnType = method.getGenericReturnType();
-                System.out.println("genericReturnType: " + genericReturnType);
+                log.debug("genericReturnType: " + genericReturnType);
                 if (genericReturnType instanceof ParameterizedType parameterizedType) {
                     Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
-                    System.out.println("actualTypeArguments: " + actualTypeArguments);
+                    log.debug("actualTypeArguments: " + actualTypeArguments);
                     Class<?> keyType = (Class<?>) actualTypeArguments[0];
                     Class<?> valueType = (Class<?>) actualTypeArguments[1];
                     for (Map.Entry<String, Object> entry : jsonResult.entrySet()) {
@@ -57,10 +59,10 @@ public class TypeUtils {
             } else if (List.class.isAssignableFrom(type)) {
                 List<Object> resultList = new ArrayList<>(array.length);
                 Type genericReturnType = method.getGenericReturnType();
-                System.out.println("genericReturnType: " + genericReturnType);
+                log.debug("genericReturnType: " + genericReturnType);
                 if (genericReturnType instanceof ParameterizedType parameterizedType) {
                     Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
-                    System.out.println("actualTypeArgument: " + actualTypeArgument);
+                    log.debug("actualTypeArgument: " + actualTypeArgument);
                     for (Object o : array) {
                         resultList.add(TypeUtils.cast(o, (Class<?>) actualTypeArgument));
                     }

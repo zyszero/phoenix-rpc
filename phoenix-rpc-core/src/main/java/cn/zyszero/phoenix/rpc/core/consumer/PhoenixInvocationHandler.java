@@ -6,6 +6,7 @@ import cn.zyszero.phoenix.rpc.core.api.RpcResponse;
 import cn.zyszero.phoenix.rpc.core.meta.InstanceMeta;
 import cn.zyszero.phoenix.rpc.core.util.MethodUtils;
 import cn.zyszero.phoenix.rpc.core.util.TypeUtils;
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -17,6 +18,7 @@ import java.util.List;
  * @Author: zyszero
  * @Date: 2024/4/1 21:10
  */
+@Slf4j
 public class PhoenixInvocationHandler implements InvocationHandler {
 
     Class<?> service;
@@ -48,7 +50,7 @@ public class PhoenixInvocationHandler implements InvocationHandler {
 
         List<InstanceMeta> instances = context.getRouter().route(providers);
         InstanceMeta instance = context.getLoadBalancer().choose(instances);
-        System.out.println("loadBalancer.choose(instance) ==> " + instance);
+        log.debug("loadBalancer.choose(instance) ==> " + instance);
 
 
         RpcResponse<?> rpcResponse = httpInvoker.post(rpcRequest, instance.toUrl());

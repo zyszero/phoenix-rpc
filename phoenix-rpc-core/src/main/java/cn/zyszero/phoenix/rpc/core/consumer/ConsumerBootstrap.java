@@ -9,6 +9,7 @@ import cn.zyszero.phoenix.rpc.core.meta.InstanceMeta;
 import cn.zyszero.phoenix.rpc.core.meta.ServiceMeta;
 import cn.zyszero.phoenix.rpc.core.util.MethodUtils;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -29,6 +30,7 @@ import java.util.Map;
  * @Date: 2024/4/1 21:10
  */
 @Data
+@Slf4j
 public class ConsumerBootstrap implements ApplicationContextAware, EnvironmentAware {
 
     ApplicationContext applicationContext;
@@ -68,7 +70,7 @@ public class ConsumerBootstrap implements ApplicationContextAware, EnvironmentAw
 
             // 3. 生成代理对象
             fields.forEach(field -> {
-                System.out.println(" ===> field: " + field.getName());
+                log.info(" ===> field: " + field.getName());
                 try {
                     Class<?> service = field.getType();
                     String serviceName = service.getCanonicalName();
@@ -96,7 +98,7 @@ public class ConsumerBootstrap implements ApplicationContextAware, EnvironmentAw
                 .name(serviceName)
                 .build();
         List<InstanceMeta> providers = registryCenter.fetchAll(serviceMeta);
-        System.out.println(" ===> map to providers: " + providers);
+        log.info(" ===> map to providers: " + providers);
         providers.forEach(System.out::println);
 
         registryCenter.subscribe(serviceMeta, event -> {

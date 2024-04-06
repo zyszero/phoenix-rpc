@@ -7,12 +7,14 @@ import cn.zyszero.phoenix.rpc.core.cluster.RoundRibonLoadBalancer;
 import cn.zyszero.phoenix.rpc.core.consumer.http.OkHttpInvoker;
 import cn.zyszero.phoenix.rpc.core.meta.InstanceMeta;
 import cn.zyszero.phoenix.rpc.core.registry.zk.ZookeeperRegistryCenter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 
+@Slf4j
 @Configuration
 public class ConsumerConfig {
 
@@ -28,9 +30,9 @@ public class ConsumerConfig {
     @Order(Integer.MIN_VALUE)
     public ApplicationRunner consumerBootstrapRunner(ConsumerBootstrap consumerBootstrap) {
         return args -> {
-            System.out.println("consumerBootstrapRunner starting ...");
+            log.info("consumerBootstrapRunner starting ...");
             consumerBootstrap.start();
-            System.out.println("consumerBootstrapRunner started ...");
+            log.info("consumerBootstrapRunner started ...");
         };
     }
 
