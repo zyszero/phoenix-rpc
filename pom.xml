@@ -3,18 +3,16 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.3</version>
-    </parent>
-
     <groupId>cn.zyszero</groupId>
     <artifactId>phoenix-rpc</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+
     <packaging>pom</packaging>
     <name>phoenix-rpc</name>
     <description>phoenix-rpc</description>
+
+
+
     <modules>
         <module>phoenix-rpc-core</module>
         <module>phoenix-rpc-demo-api</module>
@@ -24,6 +22,8 @@
 
     <properties>
         <java.version>17</java.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
     </properties>
 
 
