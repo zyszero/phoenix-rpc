@@ -12,6 +12,11 @@ public interface Filter {
 
     // Filter next();
 
+    // 微服务调用链路排查：
+    // A -> B -> C 有问题的
+    // - -> - -> D 还有问题
+    // - -> D  Mock
+
     Filter DEFAULT = new Filter() {
         @Override
         public Object preFilter(RpcRequest request) {
@@ -20,7 +25,7 @@ public interface Filter {
 
         @Override
         public Object postFilter(RpcRequest request, RpcResponse response, Object result) {
-            return result;
+            return null;
         }
     };
 }

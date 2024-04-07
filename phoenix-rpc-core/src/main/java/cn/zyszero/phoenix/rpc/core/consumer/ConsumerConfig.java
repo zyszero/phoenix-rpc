@@ -7,6 +7,7 @@ import cn.zyszero.phoenix.rpc.core.api.Router;
 import cn.zyszero.phoenix.rpc.core.cluster.RoundRibonLoadBalancer;
 import cn.zyszero.phoenix.rpc.core.consumer.http.OkHttpInvoker;
 import cn.zyszero.phoenix.rpc.core.filters.CacheFilter;
+import cn.zyszero.phoenix.rpc.core.filters.MockFilter;
 import cn.zyszero.phoenix.rpc.core.meta.InstanceMeta;
 import cn.zyszero.phoenix.rpc.core.registry.zk.ZookeeperRegistryCenter;
 import lombok.extern.slf4j.Slf4j;
@@ -67,4 +68,9 @@ public class ConsumerConfig {
     public Filter filter() {
         return new CacheFilter();
     }
+
+//    @Bean
+//    public Filter mockFilter() {
+//        return new MockFilter();
+//    }
 }
