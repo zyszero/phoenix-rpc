@@ -4,7 +4,6 @@ import cn.zyszero.phoenix.rpc.core.annotation.PhoenixProvider;
 import cn.zyszero.phoenix.rpc.demo.api.User;
 import cn.zyszero.phoenix.rpc.demo.api.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
@@ -93,6 +92,7 @@ public class UserServiceImpl implements UserService {
     public User[] findUsers(User[] users) {
         return users;
     }
+
 
     @Override
     public User findById(long id) {

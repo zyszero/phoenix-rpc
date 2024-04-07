@@ -7,7 +7,6 @@ import cn.zyszero.phoenix.rpc.core.api.Router;
 import cn.zyszero.phoenix.rpc.core.cluster.RoundRibonLoadBalancer;
 import cn.zyszero.phoenix.rpc.core.consumer.http.OkHttpInvoker;
 import cn.zyszero.phoenix.rpc.core.filters.CacheFilter;
-import cn.zyszero.phoenix.rpc.core.filters.MockFilter;
 import cn.zyszero.phoenix.rpc.core.meta.InstanceMeta;
 import cn.zyszero.phoenix.rpc.core.registry.zk.ZookeeperRegistryCenter;
 import lombok.extern.slf4j.Slf4j;
@@ -16,8 +15,6 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-
-import java.util.List;
 
 @Slf4j
 @Configuration

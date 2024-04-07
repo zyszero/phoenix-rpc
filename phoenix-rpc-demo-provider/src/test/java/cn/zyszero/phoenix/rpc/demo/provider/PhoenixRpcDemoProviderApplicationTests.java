@@ -8,7 +8,7 @@ class PhoenixRpcDemoProviderApplicationTests {
 
     @Test
     void contextLoads() {
-        System.out.println(" ===> test .... ");
+        System.out.println(" ===> provider test .... ");
     }
 
 }
