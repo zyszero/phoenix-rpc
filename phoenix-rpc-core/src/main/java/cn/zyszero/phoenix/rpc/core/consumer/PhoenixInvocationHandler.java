@@ -1,9 +1,6 @@
 package cn.zyszero.phoenix.rpc.core.consumer;
 
-import cn.zyszero.phoenix.rpc.core.api.Filter;
-import cn.zyszero.phoenix.rpc.core.api.RpcContext;
-import cn.zyszero.phoenix.rpc.core.api.RpcRequest;
-import cn.zyszero.phoenix.rpc.core.api.RpcResponse;
+import cn.zyszero.phoenix.rpc.core.api.*;
 import cn.zyszero.phoenix.rpc.core.meta.InstanceMeta;
 import cn.zyszero.phoenix.rpc.core.util.MethodUtils;
 import cn.zyszero.phoenix.rpc.core.util.TypeUtils;
@@ -39,7 +36,7 @@ public class PhoenixInvocationHandler implements InvocationHandler {
     }
 
     @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    public Object invoke(Object proxy, Method method, Object[] args) {
         if (MethodUtils.checkLocalMethod(method)) {
             return null;
         }
@@ -77,11 +74,15 @@ public class PhoenixInvocationHandler implements InvocationHandler {
         return result;
     }
 
-    private static Object castReturnResult(Method method, RpcResponse<?> rpcResponse) throws Exception {
+    private static Object castReturnResult(Method method, RpcResponse<?> rpcResponse) {
         if (rpcResponse.isStatues()) {
             return TypeUtils.castMethodResult(method, rpcResponse.getData());
         } else {
-            throw rpcResponse.getException();
+            Exception exception = rpcResponse.getException();
+            if (exception instanceof RpcException ex) {
+                throw ex;
+            }
+            throw new RpcException(exception, RpcException.UNKNOWN_EX);
         }
     }
 

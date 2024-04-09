@@ -1,6 +1,7 @@
 package cn.zyszero.phoenix.rpc.core.registry.zk;
 
 import cn.zyszero.phoenix.rpc.core.api.RegistryCenter;
+import cn.zyszero.phoenix.rpc.core.api.RpcException;
 import cn.zyszero.phoenix.rpc.core.meta.InstanceMeta;
 import cn.zyszero.phoenix.rpc.core.meta.ServiceMeta;
 import cn.zyszero.phoenix.rpc.core.registry.ChangedListener;
@@ -66,7 +67,7 @@ public class ZookeeperRegistryCenter implements RegistryCenter {
             log.info(" ===> register instance node to zk: " + instancePath);
             client.create().withMode(CreateMode.EPHEMERAL).forPath(instancePath, "provider".getBytes());
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RpcException(e);
         }
     }
 
@@ -83,7 +84,7 @@ public class ZookeeperRegistryCenter implements RegistryCenter {
             log.info(" ===> unregister instance node from zk: " + instancePath);
             client.delete().quietly().forPath(instancePath);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RpcException(e);
         }
     }
 
@@ -97,7 +98,7 @@ public class ZookeeperRegistryCenter implements RegistryCenter {
             nodes.forEach(System.out::println);
             return mapInstances(nodes);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RpcException(e);
         }
     }
 

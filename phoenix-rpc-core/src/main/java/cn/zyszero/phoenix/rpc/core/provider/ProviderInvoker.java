@@ -1,5 +1,6 @@
 package cn.zyszero.phoenix.rpc.core.provider;
 
+import cn.zyszero.phoenix.rpc.core.api.RpcException;
 import cn.zyszero.phoenix.rpc.core.api.RpcRequest;
 import cn.zyszero.phoenix.rpc.core.api.RpcResponse;
 import cn.zyszero.phoenix.rpc.core.meta.ProviderMeta;
@@ -31,9 +32,9 @@ public class ProviderInvoker {
             Object result = method.invoke(meta.getServiceImpl(), args);
             return new RpcResponse<>(true, result, null);
         } catch (InvocationTargetException e) {
-            return new RpcResponse<>(false, null, new RuntimeException(e.getTargetException().getMessage()));
+            return new RpcResponse<>(false, null, new RpcException(e.getTargetException().getMessage()));
         } catch (Exception e) {
-            return new RpcResponse<>(false, null, new RuntimeException(e.getMessage()));
+            return new RpcResponse<>(false, null, new RpcException(e.getMessage()));
         }
     }
 
