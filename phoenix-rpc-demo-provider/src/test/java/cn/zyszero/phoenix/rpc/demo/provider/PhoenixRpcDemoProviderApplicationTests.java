@@ -13,12 +13,17 @@ class PhoenixRpcDemoProviderApplicationTests {
 
     @BeforeAll
     static void init() {
+        System.out.println(" ====================================== ");
+        System.out.println(" ====================================== ");
+        System.out.println(" =============     ZK2182    ========== ");
+        System.out.println(" ====================================== ");
+        System.out.println(" ====================================== ");
         zkServer.start();
     }
 
     @Test
     void contextLoads() {
-        System.out.println(" ===> KkrpcDemoProviderApplicationTests  .... ");
+        System.out.println(" ===> PhoenixRpcDemoProviderApplicationTests  .... ");
     }
 
     @AfterAll

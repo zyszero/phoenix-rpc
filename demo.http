@@ -17,7 +17,7 @@ Content-Type: application/json
 
 
 ### 获取用户信息
-POST http://localhost:8081/
+POST http://localhost:8082/
 Content-Type: application/json
 
 {

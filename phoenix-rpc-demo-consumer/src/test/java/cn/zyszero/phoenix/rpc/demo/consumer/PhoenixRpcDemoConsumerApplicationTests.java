@@ -18,15 +18,32 @@ class PhoenixRpcDemoConsumerApplicationTests {
 
     @BeforeAll
     static void setUp() {
+        System.out.println(" ====================================== ");
+        System.out.println(" ====================================== ");
+        System.out.println(" =============     ZK2182    ========== ");
+        System.out.println(" ====================================== ");
+        System.out.println(" ====================================== ");
         testZookeeperServer.start();
+        System.out.println(" ====================================== ");
+        System.out.println(" ====================================== ");
+        System.out.println(" =============      P8848    ========== ");
+        System.out.println(" ====================================== ");
+        System.out.println(" ====================================== ");
         context = SpringApplication.run(PhoenixRpcDemoProviderApplication.class,
-                "--server.port=8848", "--phoenix.rpc.registry.zookeeper.server=localhost:2182", "--logging.level.cn.zys.phoenix.rpc=DEBUG");
+                "--server.port=8848", "--phoenix.rpc.registry.zookeeper.server=localhost:2182", "--logging.level.cn.zys.phoenix.rpc=info");
+        System.out.println(" ====================================== ");
+        System.out.println(" ====================================== ");
+        System.out.println(" =============      P8849    ========== ");
+        System.out.println(" ====================================== ");
+        System.out.println(" ====================================== ");
+        context = SpringApplication.run(PhoenixRpcDemoProviderApplication.class,
+                "--server.port=8849", "--phoenix.rpc.registry.zookeeper.server=localhost:2182", "--logging.level.cn.zys.phoenix.rpc=info");
 
     }
 
     @Test
     void contextLoads() {
-        System.out.println(" ===> consumer test contextLoads .... ");
+        System.out.println(" ===> PhoenixRpcDemoConsumerApplicationTests  ....");
     }
 
     @AfterAll
