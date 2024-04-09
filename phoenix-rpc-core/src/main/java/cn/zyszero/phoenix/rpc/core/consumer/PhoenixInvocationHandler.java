@@ -1,14 +1,15 @@
 package cn.zyszero.phoenix.rpc.core.consumer;
 
 import cn.zyszero.phoenix.rpc.core.api.*;
+import cn.zyszero.phoenix.rpc.core.consumer.http.OkHttpInvoker;
 import cn.zyszero.phoenix.rpc.core.meta.InstanceMeta;
 import cn.zyszero.phoenix.rpc.core.util.MethodUtils;
 import cn.zyszero.phoenix.rpc.core.util.TypeUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.net.SocketTimeoutException;
 import java.util.List;
 
 /**
@@ -28,11 +29,12 @@ public class PhoenixInvocationHandler implements InvocationHandler {
 
     HttpInvoker httpInvoker;
 
-    public PhoenixInvocationHandler(Class<?> service, RpcContext context, List<InstanceMeta> providers, HttpInvoker httpInvoker) {
+    public PhoenixInvocationHandler(Class<?> service, RpcContext context, List<InstanceMeta> providers) {
         this.service = service;
         this.context = context;
         this.providers = providers;
-        this.httpInvoker = httpInvoker;
+        int timeout = Integer.parseInt(context.getParameters().getOrDefault("app.timeout", "1000"));
+        this.httpInvoker = new OkHttpInvoker(timeout);
     }
 
     @Override
@@ -47,31 +49,46 @@ public class PhoenixInvocationHandler implements InvocationHandler {
         rpcRequest.setMethodSign(MethodUtils.methodSign(method));
         rpcRequest.setArgs(args);
 
+        int retries = Integer.parseInt(context.getParameters().getOrDefault("app.retries", "2"));
+        while (retries-- > 0) {
 
-        for (Filter filter : this.context.getFilters()) {
-            Object preResult = filter.preFilter(rpcRequest);
-            if (preResult != null) {
-                log.debug(filter.getClass().getName() + " ==> preFilter: " + preResult);
-                return preResult;
+            log.debug(" ===> retries: " + retries);
+
+            try {
+                // [
+                for (Filter filter : this.context.getFilters()) {
+                    Object preResult = filter.preFilter(rpcRequest);
+                    if (preResult != null) {
+                        log.debug(filter.getClass().getName() + " ==> preFilter: " + preResult);
+                        return preResult;
+                    }
+                }
+
+                // [[
+                List<InstanceMeta> instances = context.getRouter().route(providers);
+                InstanceMeta instance = context.getLoadBalancer().choose(instances);
+                log.debug("loadBalancer.choose(instance) ==> " + instance);
+
+                RpcResponse<?> rpcResponse = httpInvoker.post(rpcRequest, instance.toUrl());
+                Object result = castReturnResult(method, rpcResponse);
+
+                // ]]
+
+                for (Filter filter : this.context.getFilters()) {
+                    Object filterResult = filter.postFilter(rpcRequest, rpcResponse, result);
+                    if (filterResult != null) {
+                        return filterResult;
+                    }
+                }
+                // ]
+                return result;
+            } catch (Exception ex) {
+                if (!(ex.getCause() instanceof SocketTimeoutException)) {
+                    throw ex;
+                }
             }
         }
-
-        List<InstanceMeta> instances = context.getRouter().route(providers);
-        InstanceMeta instance = context.getLoadBalancer().choose(instances);
-        log.debug("loadBalancer.choose(instance) ==> " + instance);
-
-        RpcResponse<?> rpcResponse = httpInvoker.post(rpcRequest, instance.toUrl());
-        Object result = castReturnResult(method, rpcResponse);
-
-
-        for (Filter filter : this.context.getFilters()) {
-            Object filterResult = filter.postFilter(rpcRequest, rpcResponse, result);
-            if (filterResult != null) {
-                return filterResult;
-            }
-        }
-
-        return result;
+        return null;
     }
 
     private static Object castReturnResult(Method method, RpcResponse<?> rpcResponse) {

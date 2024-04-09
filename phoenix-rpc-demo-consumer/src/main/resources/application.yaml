@@ -3,7 +3,6 @@ server:
 
 phoenix:
   rpc:
-    providers: "http://localhost:8081/,http://localhost:8082/,http://localhost:8083/"
     registry:
       zookeeper:
         server: 192.168.200.61:2181
@@ -14,8 +13,10 @@ app:
   id: app1
   namespace: public
   env: dev
+  retries: 2
+  timeout: 1000
   
 logging:
   level:
     root: error
-    cn.zyszero.phoenix.rpc: info
+    cn.zyszero.phoenix.rpc: debug

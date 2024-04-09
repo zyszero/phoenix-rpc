@@ -46,13 +46,18 @@ public class ConsumerBootstrap implements ApplicationContextAware, EnvironmentAw
     @Value("${app.env}")
     private String env;
 
+    @Value("${app.retries}")
+    private String retries;
+
+    @Value("${app.timeout}")
+    private String timeout;
+
 
     public void start() {
 
         Router<InstanceMeta> router = applicationContext.getBean(Router.class);
         LoadBalancer<InstanceMeta> loadBalancer = applicationContext.getBean(LoadBalancer.class);
         RegistryCenter registryCenter = applicationContext.getBean(RegistryCenter.class);
-        HttpInvoker httpInvoker = applicationContext.getBean(HttpInvoker.class);
         List<Filter> filters = applicationContext.getBeansOfType(Filter.class).values().stream().toList();
 
 
@@ -60,6 +65,8 @@ public class ConsumerBootstrap implements ApplicationContextAware, EnvironmentAw
         rpcContext.setFilters(filters);
         rpcContext.setRouter(router);
         rpcContext.setLoadBalancer(loadBalancer);
+        rpcContext.getParameters().put("app.retries", retries);
+        rpcContext.getParameters().put("app.timeout", timeout);
 
         // 1. 获取所有的 bean definition name
         String[] names = applicationContext.getBeanDefinitionNames();
@@ -77,7 +84,7 @@ public class ConsumerBootstrap implements ApplicationContextAware, EnvironmentAw
                     Object consumer = stub.get(serviceName);
                     if (consumer == null) {
                         // 3.1 生成代理对象
-                        consumer = createConsumerFromRegistry(service, rpcContext, registryCenter, httpInvoker);
+                        consumer = createConsumerFromRegistry(service, rpcContext, registryCenter);
                         stub.put(serviceName, consumer);
                         field.setAccessible(true);
                         field.set(bean, consumer);
@@ -89,7 +96,7 @@ public class ConsumerBootstrap implements ApplicationContextAware, EnvironmentAw
         }
     }
 
-    private Object createConsumerFromRegistry(Class<?> service, RpcContext context, RegistryCenter registryCenter, HttpInvoker httpInvoker) {
+    private Object createConsumerFromRegistry(Class<?> service, RpcContext context, RegistryCenter registryCenter) {
         String serviceName = service.getCanonicalName();
         ServiceMeta serviceMeta = ServiceMeta.builder()
                 .app(app)
@@ -107,14 +114,14 @@ public class ConsumerBootstrap implements ApplicationContextAware, EnvironmentAw
         });
 
 
-        return createConsumer(service, context, providers, httpInvoker);
+        return createConsumer(service, context, providers);
     }
 
 
-    private Object createConsumer(Class<?> service, RpcContext context, List<InstanceMeta> providers, HttpInvoker httpInvoker) {
+    private Object createConsumer(Class<?> service, RpcContext context, List<InstanceMeta> providers) {
         // JDK 动态代理
         return Proxy.newProxyInstance(service.getClassLoader(), new Class[]{service},
-                new PhoenixInvocationHandler(service, context, providers, httpInvoker));
+                new PhoenixInvocationHandler(service, context, providers));
     }
 
 

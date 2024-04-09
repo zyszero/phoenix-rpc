@@ -3,6 +3,7 @@ package cn.zyszero.phoenix.rpc.core.api;
 import cn.zyszero.phoenix.rpc.core.meta.InstanceMeta;
 import lombok.Data;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,5 +24,5 @@ public class RpcContext {
      * 打标记
      * 比如：机房、单元等
      */
-    private Map<String, String> parameters;
+    private Map<String, String> parameters = new HashMap<>();
 }

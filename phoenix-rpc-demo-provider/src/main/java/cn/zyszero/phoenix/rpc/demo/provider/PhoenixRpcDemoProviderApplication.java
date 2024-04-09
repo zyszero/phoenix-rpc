@@ -2,7 +2,6 @@ package cn.zyszero.phoenix.rpc.demo.provider;
 
 import cn.zyszero.phoenix.rpc.core.api.RpcRequest;
 import cn.zyszero.phoenix.rpc.core.api.RpcResponse;
-import cn.zyszero.phoenix.rpc.core.provider.ProviderBootstrap;
 import cn.zyszero.phoenix.rpc.core.provider.ProviderConfig;
 import cn.zyszero.phoenix.rpc.core.provider.ProviderInvoker;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +33,6 @@ public class PhoenixRpcDemoProviderApplication {
     public RpcResponse<Object> invoke(@RequestBody RpcRequest request) {
         return providerInvoker.invoke(request);
     }
-
 
     @Bean
     public ApplicationRunner runner() {
