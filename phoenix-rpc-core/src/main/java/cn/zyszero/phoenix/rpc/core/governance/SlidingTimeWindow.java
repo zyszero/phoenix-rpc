@@ -2,6 +2,7 @@ package cn.zyszero.phoenix.rpc.core.governance;
 
 import lombok.Getter;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * SlidingTimeWindow implement based on RingBuffer and TS(timestamp).
@@ -12,6 +13,7 @@ import lombok.ToString;
  */
 @Getter
 @ToString
+@Slf4j
 public class SlidingTimeWindow {
     public static final int DEFAULT_SIZE = 30;
 
@@ -42,34 +44,34 @@ public class SlidingTimeWindow {
      * @param millis
      */
     public synchronized void record(long millis) {
-        System.out.println("window before: " + this);
-        System.out.println("window.record(" + millis + ")");
+        log.debug("window before: {}", this);
+        log.debug("window.record({})", millis);
         long ts = millis / 1000;
         if (_start_ts == -1L) {
             initRing(ts);
         } else {   // TODO  Prev 是否需要考虑
             if (ts == _curr_ts) {
-                System.out.println("window ts:" + ts + ", curr_ts:" + _curr_ts + ", size:" + size);
+                log.debug("window ts: {}, curr_ts: {}, size: {} ", ts, _curr_ts, size);
                 this.ringBuffer.incr(_curr_mark, 1);
             } else if (ts > _curr_ts && ts < _curr_ts + size) {
                 int offset = (int) (ts - _curr_ts);
-                System.out.println("window ts:" + ts + ", curr_ts:" + _curr_ts + ", size:" + size + ", offset:" + offset);
+                log.debug("window ts: {}, curr_ts: {}, size: {}, offset: {}", ts, _curr_ts, size, offset);
                 this.ringBuffer.reset(_curr_mark + 1, offset);
                 this.ringBuffer.incr(_curr_mark + offset, 1);
                 _curr_ts = ts;
                 _curr_mark = (_curr_mark + offset) % size;
             } else if (ts >= _curr_ts + size) {
-                System.out.println("window ts:" + ts + ", curr_ts:" + _curr_ts + ", size:" + size);
+                log.debug("window ts: {}, curr_ts: {}, size: {} ", ts, _curr_ts, size);
                 this.ringBuffer.reset();
                 initRing(ts);
             }
         }
         this.sum = this.ringBuffer.sum();
-        System.out.println("window after: " + this.toString());
+        log.debug("window after: {}", this);
     }
 
     private void initRing(long ts) {
-        System.out.println("window initRing ts:" + ts);
+        log.debug("window initRing ts: {}", ts);
         this._start_ts = ts;
         this._curr_ts = ts;
         this._curr_mark = 0;
