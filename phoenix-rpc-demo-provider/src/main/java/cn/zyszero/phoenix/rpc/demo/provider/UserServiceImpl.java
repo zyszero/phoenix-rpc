@@ -8,6 +8,7 @@ import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -107,14 +108,25 @@ public class UserServiceImpl implements UserService {
         return new User(100, "ZZ100");
     }
 
+
+    String timeoutPorts = "8081,8094";
+
     @Override
     public User find(int timeout) {
-        try {
-            String p = environment.getProperty("server.port");
-            if("8081".equals(p)) Thread.sleep(timeout);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+        String port = environment.getProperty("server.port");
+        if (Arrays.asList(timeoutPorts.split(",")).contains(port)) {
+            try {
+                Thread.sleep(timeout);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
         return findById(100);
+    }
+
+
+    @Override
+    public void setTimeoutPorts(String timeoutPorts) {
+        this.timeoutPorts = timeoutPorts;
     }
 }

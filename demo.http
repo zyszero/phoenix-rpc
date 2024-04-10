@@ -4,7 +4,12 @@ GET http://localhost:8080/user?id=100
 
 
 ### 获取用户信息
-GET http://localhost:8080/find?timeout=1000
+GET http://localhost:8080/find?timeout=1100
+
+
+### 通过8081调用set Timeout Ports
+GET http://localhost:8081/ports?ports=8080,8094
+
 
 
 ### 获取用户信息
