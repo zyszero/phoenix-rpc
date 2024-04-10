@@ -42,7 +42,6 @@ public class PhoenixRpcDemoConsumerApplication {
     }
 
 
-
     public static void main(String[] args) {
         SpringApplication.run(PhoenixRpcDemoConsumerApplication.class, args);
     }
@@ -148,11 +147,14 @@ public class PhoenixRpcDemoConsumerApplication {
             System.out.println(" ===> exception: " + e.getMessage());
         }
 
+        System.out.println("Case 18. >>===[测试服务端抛出一个超时重试后成功的场景]===");
+        // 超时设置的【漏斗原则】
+        // A 2000 -> B 1500 -> C 1200 -> D 1000
+        long start = System.currentTimeMillis();
+        userService.find(1100);
+        userService.find(1000);
+        System.out.println("userService.find take "
+                + (System.currentTimeMillis() - start) + "ms");
 
-//            Order order = orderService.findById(2);
-//            System.out.printf("order: %s\n", order);
-//
-//            Order order404 = orderService.findById(404);
-//            System.out.printf("order404: %s\n", order404);
     }
 }

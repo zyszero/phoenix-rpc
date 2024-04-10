@@ -12,7 +12,8 @@ import org.springframework.context.ApplicationContext;
 @SpringBootTest
 class PhoenixRpcDemoConsumerApplicationTests {
 
-    static ApplicationContext context;
+    static ApplicationContext context1;
+    static ApplicationContext context2;
 
     static TestZookeeperServer testZookeeperServer = new TestZookeeperServer();
 
@@ -26,18 +27,18 @@ class PhoenixRpcDemoConsumerApplicationTests {
         testZookeeperServer.start();
         System.out.println(" ====================================== ");
         System.out.println(" ====================================== ");
-        System.out.println(" =============      P8848    ========== ");
+        System.out.println(" =============      P8094    ========== ");
         System.out.println(" ====================================== ");
         System.out.println(" ====================================== ");
-        context = SpringApplication.run(PhoenixRpcDemoProviderApplication.class,
-                "--server.port=8848", "--phoenix.rpc.registry.zookeeper.server=localhost:2182", "--logging.level.cn.zys.phoenix.rpc=info");
+        context1 = SpringApplication.run(PhoenixRpcDemoProviderApplication.class,
+                "--server.port=8094", "--phoenix.rpc.registry.zookeeper.server=localhost:2182", "--logging.level.cn.zys.phoenix.rpc=info");
         System.out.println(" ====================================== ");
         System.out.println(" ====================================== ");
-        System.out.println(" =============      P8849    ========== ");
+        System.out.println(" =============      P8095    ========== ");
         System.out.println(" ====================================== ");
         System.out.println(" ====================================== ");
-        context = SpringApplication.run(PhoenixRpcDemoProviderApplication.class,
-                "--server.port=8849", "--phoenix.rpc.registry.zookeeper.server=localhost:2182", "--logging.level.cn.zys.phoenix.rpc=info");
+        context2 = SpringApplication.run(PhoenixRpcDemoProviderApplication.class,
+                "--server.port=8095", "--phoenix.rpc.registry.zookeeper.server=localhost:2182", "--logging.level.cn.zys.phoenix.rpc=info");
 
     }
 
@@ -48,7 +49,8 @@ class PhoenixRpcDemoConsumerApplicationTests {
 
     @AfterAll
     static void destroy() {
-        SpringApplication.exit(context, () -> 1);
+        SpringApplication.exit(context1, () -> 1);
+        SpringApplication.exit(context2, () -> 1);
         testZookeeperServer.stop();
     }
 
