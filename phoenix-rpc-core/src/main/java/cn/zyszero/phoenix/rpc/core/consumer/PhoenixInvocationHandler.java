@@ -41,7 +41,7 @@ public class PhoenixInvocationHandler implements InvocationHandler {
 
     HttpInvoker httpInvoker;
 
-    Map<String, SlidingTimeWindow> windows = new HashMap<>();
+    final Map<String, SlidingTimeWindow> windows = new HashMap<>();
 
     ScheduledExecutorService executor;
 
@@ -111,18 +111,21 @@ public class PhoenixInvocationHandler implements InvocationHandler {
                     // 故障的规则统计和隔离
                     // 每一次异常，记录一次，统计 30s 内的异常数
 
-                    SlidingTimeWindow window = windows.get(url);
-                    if (window == null) {
-                        window = new SlidingTimeWindow();
-                        windows.put(url, window);
+                    synchronized (windows) {
+                        SlidingTimeWindow window = windows.get(url);
+                        if (window == null) {
+                            window = new SlidingTimeWindow();
+                            windows.put(url, window);
+                        }
+
+                        window.record(System.currentTimeMillis());
+                        log.debug("instance {} in window with {}", instance, window.getSum());
+                        // 发生了 10 次，就做故障隔离
+                        if (window.getSum() >= 10) {
+                            isolate(instance);
+                        }
                     }
 
-                    window.record(System.currentTimeMillis());
-                    log.debug("instance {} in window with {}", instance, window.getSum());
-                    // 发生了 10 次，就做故障隔离
-                    if (window.getSum() >= 10) {
-                        isolate(instance);
-                    }
                     throw ex;
                 }
 
