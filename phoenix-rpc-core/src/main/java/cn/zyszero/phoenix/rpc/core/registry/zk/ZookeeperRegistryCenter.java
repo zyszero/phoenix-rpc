@@ -62,8 +62,7 @@ public class ZookeeperRegistryCenter implements RegistryCenter {
         try {
             // 创建服务的持久化节点
             if (client.checkExists().forPath(servicePath) == null) {
-                log.info(" ===> register service node to zk: " + servicePath);
-                client.create().withMode(CreateMode.PERSISTENT).forPath(servicePath, "service".getBytes());
+                client.create().withMode(CreateMode.PERSISTENT).forPath(servicePath, service.toMetas().getBytes());
             }
             // 创建实例的临时性节点
             String instancePath = servicePath + "/" + instance.toPath();
@@ -83,7 +82,7 @@ public class ZookeeperRegistryCenter implements RegistryCenter {
                 return;
             }
             // 删除实例节点
-            String instancePath = "/" + service + "/" + instance.toPath();
+            String instancePath = servicePath + "/" + instance.toPath();
             log.info(" ===> unregister instance node from zk: " + instancePath);
             client.delete().quietly().forPath(instancePath);
         } catch (Exception e) {
