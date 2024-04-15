@@ -55,6 +55,8 @@ public class ProviderBootstrap implements ApplicationContextAware {
     @Value("${app.env}")
     private String env;
 
+    @Value("#{${app.metas}}") // SPEL
+    Map<String, String> metas;
 
     private RegistryCenter registryCenter;
 
@@ -70,6 +72,7 @@ public class ProviderBootstrap implements ApplicationContextAware {
     public void start() {
         String ip = InetAddress.getLocalHost().getHostAddress();
         this.instance = InstanceMeta.http(ip, Integer.parseInt(port));
+        this.instance.getParameters().putAll(metas);
         registryCenter.start();
         skeleton.keySet().forEach(this::registerService);
     }

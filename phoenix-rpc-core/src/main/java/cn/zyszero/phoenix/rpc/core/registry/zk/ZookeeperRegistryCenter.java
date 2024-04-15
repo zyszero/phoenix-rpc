@@ -6,6 +6,7 @@ import cn.zyszero.phoenix.rpc.core.meta.InstanceMeta;
 import cn.zyszero.phoenix.rpc.core.meta.ServiceMeta;
 import cn.zyszero.phoenix.rpc.core.registry.ChangedListener;
 import cn.zyszero.phoenix.rpc.core.registry.Event;
+import com.alibaba.fastjson.JSON;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.RetryPolicy;
@@ -17,7 +18,9 @@ import org.apache.zookeeper.CreateMode;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -27,7 +30,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ZookeeperRegistryCenter implements RegistryCenter {
 
-    private CuratorFramework client = null;
+    private static CuratorFramework client = null;
 
     @Value("${phoenix.rpc.registry.zookeeper.server}")
     private String zkServer;
@@ -65,7 +68,7 @@ public class ZookeeperRegistryCenter implements RegistryCenter {
             // 创建实例的临时性节点
             String instancePath = servicePath + "/" + instance.toPath();
             log.info(" ===> register instance node to zk: " + instancePath);
-            client.create().withMode(CreateMode.EPHEMERAL).forPath(instancePath, "provider".getBytes());
+            client.create().withMode(CreateMode.EPHEMERAL).forPath(instancePath, instance.toMetas().getBytes());
         } catch (Exception e) {
             throw new RpcException(e);
         }
@@ -96,18 +99,30 @@ public class ZookeeperRegistryCenter implements RegistryCenter {
             log.info(" ===> fetch all instance nodes from zk: " + servicePath);
             List<String> nodes = client.getChildren().forPath(servicePath);
             nodes.forEach(System.out::println);
-            return mapInstances(nodes);
+            return mapInstances(nodes, servicePath);
         } catch (Exception e) {
             throw new RpcException(e);
         }
     }
 
     @NotNull
-    private static List<InstanceMeta> mapInstances(List<String> nodes) {
+    private static List<InstanceMeta> mapInstances(List<String> nodes, String servicePath) {
         return nodes.stream()
                 .map(node -> {
                     String[] strs = node.split("_");
-                    return InstanceMeta.http(strs[0], Integer.valueOf(strs[1]));
+                    InstanceMeta instance = InstanceMeta.http(strs[0], Integer.valueOf(strs[1]));
+                    log.info(" instance: {}", instance.toUrl());
+                    String nodePath = servicePath + "/" + node;
+                    byte[] bytes;
+                    try {
+                        bytes = client.getData().forPath(nodePath);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                    Map<String, String> params = JSON.parseObject(new String(bytes), HashMap.class);
+                    params.forEach((k, v) -> log.info(" ===> key: " + k + ", value: " + v));
+                    instance.setParameters(params);
+                    return instance;
                 })
                 .collect(Collectors.toList());
     }
