@@ -21,63 +21,6 @@ import java.util.*;
 @Slf4j
 public class TypeUtils {
 
-    @Nullable
-    public static Object castMethodResult(Method method, Object data) {
-        Class<?> type = method.getReturnType();
-        log.debug("method.getReturnType(): " + type);
-        if (data instanceof JSONObject jsonResult) {
-            if (Map.class.isAssignableFrom(type)) {
-                Map resultMap = new HashMap<>();
-                Type genericReturnType = method.getGenericReturnType();
-                log.debug("genericReturnType: " + genericReturnType);
-                if (genericReturnType instanceof ParameterizedType parameterizedType) {
-                    Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
-                    log.debug("actualTypeArguments: " + actualTypeArguments);
-                    Class<?> keyType = (Class<?>) actualTypeArguments[0];
-                    Class<?> valueType = (Class<?>) actualTypeArguments[1];
-                    for (Map.Entry<String, Object> entry : jsonResult.entrySet()) {
-                        resultMap.put(TypeUtils.cast(entry.getKey(), keyType), TypeUtils.cast(entry.getValue(), valueType));
-                    }
-                }
-                return resultMap;
-            }
-            return ((JSONObject) data).toJavaObject(method.getReturnType());
-        } else if (data instanceof JSONArray jsonArray) {
-            Object[] array = jsonArray.toArray();
-            if (type.isArray()) {
-                Class<?> componentType = method.getReturnType().getComponentType();
-                Object resultArray = Array.newInstance(componentType, array.length);
-                for (int i = 0; i < array.length; i++) {
-                    if (componentType.isPrimitive() || componentType.getPackageName().startsWith("java")) {
-                        Array.set(resultArray, i, array[i]);
-                    } else {
-                        Object castObject = TypeUtils.cast(array[i], componentType);
-                        Array.set(resultArray, i, castObject);
-                    }
-                }
-                return resultArray;
-            } else if (List.class.isAssignableFrom(type)) {
-                List<Object> resultList = new ArrayList<>(array.length);
-                Type genericReturnType = method.getGenericReturnType();
-                log.debug("genericReturnType: " + genericReturnType);
-                if (genericReturnType instanceof ParameterizedType parameterizedType) {
-                    Type actualTypeArgument = parameterizedType.getActualTypeArguments()[0];
-                    log.debug("actualTypeArgument: " + actualTypeArgument);
-                    for (Object o : array) {
-                        resultList.add(TypeUtils.cast(o, (Class<?>) actualTypeArgument));
-                    }
-                } else {
-                    resultList.addAll(Arrays.asList(array));
-                }
-                return resultList;
-            } else {
-                return null;
-            }
-        } else {
-            return TypeUtils.cast(data, method.getReturnType());
-        }
-    }
-
     public static Object cast(Object origin, Class<?> type) {
         if (origin == null) {
             return null;
@@ -140,6 +83,14 @@ public class TypeUtils {
 
         return null;
     }
+
+    @Nullable
+    public static Object castMethodResult(Method method, Object data) {
+        Class<?> type = method.getReturnType();
+        Type genericReturnType = method.getGenericReturnType();
+        return castGeneric(data, type, genericReturnType);
+    }
+
 
     @SuppressWarnings("unchecked")
     public static Object castGeneric(Object data, Class<?> type, Type genericReturnType) {
