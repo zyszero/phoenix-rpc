@@ -23,7 +23,7 @@ public class InstanceMeta {
 
     private Integer port;
 
-    private String context;
+    private String context; // dubbo url?k1=v1
 
     private boolean status; // online or offline
 
@@ -37,6 +37,7 @@ public class InstanceMeta {
     /**
      * 打标记
      * 比如：机房、单元等
+     * idc A B C
      */
     private Map<String, String> parameters;
 
