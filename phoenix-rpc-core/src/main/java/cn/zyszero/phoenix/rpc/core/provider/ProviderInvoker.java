@@ -9,6 +9,7 @@ import org.springframework.util.MultiValueMap;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.List;
 
 /**
@@ -28,7 +29,7 @@ public class ProviderInvoker {
         try {
             ProviderMeta meta = findProviderMeta(providerMetas, request.getMethodSign());
             Method method = meta.getMethod();
-            Object[] args = processArgs(request.getArgs(), method.getParameterTypes());
+            Object[] args = processArgs(request.getArgs(), method.getParameterTypes(), method.getGenericParameterTypes());
             Object result = method.invoke(meta.getServiceImpl(), args);
             return new RpcResponse<>(true, result, null);
         } catch (InvocationTargetException e) {
@@ -38,12 +39,12 @@ public class ProviderInvoker {
         }
     }
 
-    private Object[] processArgs(Object[] args, Class<?>[] parameterTypes) {
+    private Object[] processArgs(Object[] args, Class<?>[] parameterTypes, Type[] genericParameterTypes) {
         if (args == null || args.length == 0) {
             return args;
         }
         for (int i = 0; i < args.length; i++) {
-            args[i] = TypeUtils.cast(args[i], parameterTypes[i]);
+            args[i] = TypeUtils.castGeneric(args[i], parameterTypes[i], genericParameterTypes[i]);
         }
         return args;
     }
