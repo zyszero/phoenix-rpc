@@ -52,6 +52,8 @@ public class ConsumerBootstrap implements ApplicationContextAware, EnvironmentAw
     @Value("${app.timeout}")
     private String timeout;
 
+    @Value("${app.gray-ratio}")
+    private String grayRatio;
 
     public void start() {
 
@@ -67,6 +69,7 @@ public class ConsumerBootstrap implements ApplicationContextAware, EnvironmentAw
         rpcContext.setLoadBalancer(loadBalancer);
         rpcContext.getParameters().put("app.retries", retries);
         rpcContext.getParameters().put("app.timeout", timeout);
+//        rpcContext.getParameters().put("app.gray-radio", grayRatio);
 
         // 1. 获取所有的 bean definition name
         String[] names = applicationContext.getBeanDefinitionNames();

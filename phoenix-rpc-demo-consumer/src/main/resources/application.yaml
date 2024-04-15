@@ -15,8 +15,9 @@ app:
   env: dev
   retries: 2
   timeout: 1000
+  gray-ratio: 10 # 0-100 流量灰度比例
   
 logging:
   level:
     root: error
-    cn.zyszero.phoenix.rpc: info
+    cn.zyszero.phoenix.rpc: debug

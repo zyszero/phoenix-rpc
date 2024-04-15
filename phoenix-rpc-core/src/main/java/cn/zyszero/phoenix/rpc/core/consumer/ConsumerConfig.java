@@ -3,10 +3,12 @@ package cn.zyszero.phoenix.rpc.core.consumer;
 import cn.zyszero.phoenix.rpc.core.api.LoadBalancer;
 import cn.zyszero.phoenix.rpc.core.api.RegistryCenter;
 import cn.zyszero.phoenix.rpc.core.api.Router;
+import cn.zyszero.phoenix.rpc.core.cluster.GrayRouter;
 import cn.zyszero.phoenix.rpc.core.cluster.RoundRibonLoadBalancer;
 import cn.zyszero.phoenix.rpc.core.meta.InstanceMeta;
 import cn.zyszero.phoenix.rpc.core.registry.zk.ZookeeperRegistryCenter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +17,9 @@ import org.springframework.core.annotation.Order;
 @Slf4j
 @Configuration
 public class ConsumerConfig {
+
+    @Value("${app.gray-ratio}")
+    private String grayRatio;
 
 
     @Bean
@@ -41,7 +46,7 @@ public class ConsumerConfig {
     @Bean
     @SuppressWarnings("unchecked")
     public Router<InstanceMeta> route() {
-        return Router.DEFAULT;
+        return new GrayRouter(Integer.parseInt(grayRatio));
     }
 
     @Bean(initMethod = "start", destroyMethod = "stop")

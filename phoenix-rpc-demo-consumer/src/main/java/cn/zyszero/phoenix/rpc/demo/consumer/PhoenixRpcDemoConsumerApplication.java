@@ -1,10 +1,13 @@
 package cn.zyszero.phoenix.rpc.demo.consumer;
 
 import cn.zyszero.phoenix.rpc.core.annotation.PhoenixConsumer;
+import cn.zyszero.phoenix.rpc.core.api.Router;
+import cn.zyszero.phoenix.rpc.core.cluster.GrayRouter;
 import cn.zyszero.phoenix.rpc.core.consumer.ConsumerConfig;
-import cn.zyszero.phoenix.rpc.demo.api.OrderService;
+import cn.zyszero.phoenix.rpc.core.meta.InstanceMeta;
 import cn.zyszero.phoenix.rpc.demo.api.User;
 import cn.zyszero.phoenix.rpc.demo.api.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -27,8 +30,6 @@ public class PhoenixRpcDemoConsumerApplication {
     @PhoenixConsumer
     UserService userService;
 
-    @PhoenixConsumer
-    OrderService orderService;
 
     @GetMapping("/user")
     public User findBy(@RequestParam("id") int id) {
@@ -39,6 +40,16 @@ public class PhoenixRpcDemoConsumerApplication {
     @RequestMapping("/find")
     public User find(@RequestParam("timeout") int timeout) {
         return userService.find(timeout);
+    }
+
+
+    @Autowired
+    private Router<InstanceMeta> grayRouter;
+
+    @RequestMapping("/gray")
+    public String gray(@RequestParam("radio") int radio) {
+        ((GrayRouter)grayRouter).setGrayRatio(radio);
+        return "OK-new gray ratio is " + radio;
     }
 
 
