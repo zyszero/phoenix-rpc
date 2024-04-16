@@ -20,4 +20,4 @@ app:
 logging:
   level:
     root: error
-    cn.zyszero.phoenix.rpc: debug
+    cn.zyszero.phoenix.rpc: info

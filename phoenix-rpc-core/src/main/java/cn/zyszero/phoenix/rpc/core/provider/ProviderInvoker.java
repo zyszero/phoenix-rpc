@@ -45,8 +45,10 @@ public class ProviderInvoker {
             return rpcResponse;
         } catch (InvocationTargetException e) {
             rpcResponse = new RpcResponse<>(false, null, new RpcException(e.getTargetException().getMessage()));
-        } catch (Exception e) {
+        } catch (IllegalAccessException | IllegalArgumentException e) {
             rpcResponse = new RpcResponse<>(false, null, new RpcException(e.getMessage()));
+        } finally {
+            RpcContext.ContextParameters.get().clear(); // 防止内存泄露和上下文污染
         }
         log.debug(" ===> ProviderInvoker.invoke() = {}", rpcResponse);
         return rpcResponse;

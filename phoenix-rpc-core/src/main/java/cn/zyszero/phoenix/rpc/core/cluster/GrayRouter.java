@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+
 /**
  * 灰度路由.
  * <p>
@@ -50,12 +51,12 @@ public class GrayRouter implements Router<InstanceMeta> {
             }
         });
 
+        log.debug(" grayRouter grayNodes/normalNodes,grayRatio ===> {}/{},{}",
+                grayNodes.size(), normalNodes.size(), grayRatio);
+
         if (normalNodes.isEmpty() || grayNodes.isEmpty()) {
             return providers;
         }
-
-        log.debug(" grayRouter grayNodes/normalNodes,grayRatio ===> {}/{},{}",
-                grayNodes.size(), normalNodes.size(), grayRatio);
 
         if (grayRatio <= 0) {
             return normalNodes;
