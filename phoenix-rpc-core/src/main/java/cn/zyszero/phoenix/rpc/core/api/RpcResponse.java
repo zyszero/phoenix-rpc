@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
+ * response data for RPC call
  * @Author: zyszero
  * @create: 2020/12/13
  */
@@ -21,5 +22,5 @@ public class RpcResponse<T> {
      */
     private T data;
 
-    private Exception exception;
+    private RpcException exception;
 }

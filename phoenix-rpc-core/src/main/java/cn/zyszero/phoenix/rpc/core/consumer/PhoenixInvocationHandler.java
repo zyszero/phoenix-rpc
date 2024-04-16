@@ -168,11 +168,12 @@ public class PhoenixInvocationHandler implements InvocationHandler {
         if (rpcResponse.isStatues()) {
             return TypeUtils.castMethodResult(method, rpcResponse.getData());
         } else {
-            Exception exception = rpcResponse.getException();
-            if (exception instanceof RpcException ex) {
-                throw ex;
+            RpcException exception = rpcResponse.getException();
+            if (exception != null) {
+                log.debug("response error: {}", exception.getMessage());
+                throw exception;
             }
-            throw new RpcException(exception, RpcException.UNKNOWN_EX);
+            return null;
         }
     }
 
