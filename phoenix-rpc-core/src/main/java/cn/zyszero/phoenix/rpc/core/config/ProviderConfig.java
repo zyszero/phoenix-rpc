@@ -1,9 +1,13 @@
-package cn.zyszero.phoenix.rpc.core.provider;
+package cn.zyszero.phoenix.rpc.core.config;
 
 import cn.zyszero.phoenix.rpc.core.api.RegistryCenter;
+import cn.zyszero.phoenix.rpc.core.provider.ProviderBootstrap;
+import cn.zyszero.phoenix.rpc.core.provider.ProviderInvoker;
 import cn.zyszero.phoenix.rpc.core.registry.zk.ZookeeperRegistryCenter;
 import cn.zyszero.phoenix.rpc.core.transport.SpringBootTransport;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,11 +16,21 @@ import org.springframework.core.annotation.Order;
 
 @Slf4j
 @Configuration
-@Import({SpringBootTransport.class})
+@Import({AppConfigProperties.class, ProviderConfigProperties.class, SpringBootTransport.class})
 public class ProviderConfig {
+
+    @Value("${server.port:8080}")
+    private String port;
+
+    @Autowired
+    private AppConfigProperties appConfigProperties;
+
+    @Autowired
+    private ProviderConfigProperties providerConfigProperties;
+
     @Bean
     public ProviderBootstrap providerBootstrap() {
-        return new ProviderBootstrap();
+        return new ProviderBootstrap(port, appConfigProperties, providerConfigProperties);
     }
 
 

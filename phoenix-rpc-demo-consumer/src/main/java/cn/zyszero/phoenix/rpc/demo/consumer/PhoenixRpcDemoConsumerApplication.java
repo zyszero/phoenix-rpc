@@ -4,7 +4,7 @@ import cn.zyszero.phoenix.rpc.core.annotation.PhoenixConsumer;
 import cn.zyszero.phoenix.rpc.core.api.Router;
 import cn.zyszero.phoenix.rpc.core.api.RpcContext;
 import cn.zyszero.phoenix.rpc.core.cluster.GrayRouter;
-import cn.zyszero.phoenix.rpc.core.consumer.ConsumerConfig;
+import cn.zyszero.phoenix.rpc.core.config.ConsumerConfig;
 import cn.zyszero.phoenix.rpc.core.meta.InstanceMeta;
 import cn.zyszero.phoenix.rpc.demo.api.User;
 import cn.zyszero.phoenix.rpc.demo.api.UserService;

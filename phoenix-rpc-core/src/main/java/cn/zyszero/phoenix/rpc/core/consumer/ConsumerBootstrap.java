@@ -36,40 +36,9 @@ public class ConsumerBootstrap implements ApplicationContextAware, EnvironmentAw
 
     private Map<String, Object> stub = new HashMap<>();
 
-
-    @Value("${app.id}")
-    private String app;
-
-    @Value("${app.namespace}")
-    private String namespace;
-
-    @Value("${app.env}")
-    private String env;
-
-    @Value("${app.retries}")
-    private String retries;
-
-    @Value("${app.timeout}")
-    private String timeout;
-
-    @Value("${app.gray-ratio}")
-    private String grayRatio;
-
     public void start() {
-
-        Router<InstanceMeta> router = applicationContext.getBean(Router.class);
-        LoadBalancer<InstanceMeta> loadBalancer = applicationContext.getBean(LoadBalancer.class);
         RegistryCenter registryCenter = applicationContext.getBean(RegistryCenter.class);
-        List<Filter> filters = applicationContext.getBeansOfType(Filter.class).values().stream().toList();
-
-
-        RpcContext rpcContext = new RpcContext();
-        rpcContext.setFilters(filters);
-        rpcContext.setRouter(router);
-        rpcContext.setLoadBalancer(loadBalancer);
-        rpcContext.getParameters().put("app.retries", retries);
-        rpcContext.getParameters().put("app.timeout", timeout);
-//        rpcContext.getParameters().put("app.gray-radio", grayRatio);
+        RpcContext rpcContext = applicationContext.getBean(RpcContext.class);
 
         // 1. 获取所有的 bean definition name
         String[] names = applicationContext.getBeanDefinitionNames();
@@ -102,9 +71,9 @@ public class ConsumerBootstrap implements ApplicationContextAware, EnvironmentAw
     private Object createConsumerFromRegistry(Class<?> service, RpcContext context, RegistryCenter registryCenter) {
         String serviceName = service.getCanonicalName();
         ServiceMeta serviceMeta = ServiceMeta.builder()
-                .app(app)
-                .namespace(namespace)
-                .env(env)
+                .app(context.param("app.id"))
+                .namespace(context.param("app.namespace"))
+                .env(context.param("app.env"))
                 .name(serviceName)
                 .build();
         List<InstanceMeta> providers = registryCenter.fetchAll(serviceMeta);

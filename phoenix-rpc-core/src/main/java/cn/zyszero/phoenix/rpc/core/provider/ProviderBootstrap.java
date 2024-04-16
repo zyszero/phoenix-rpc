@@ -2,29 +2,25 @@ package cn.zyszero.phoenix.rpc.core.provider;
 
 import cn.zyszero.phoenix.rpc.core.annotation.PhoenixProvider;
 import cn.zyszero.phoenix.rpc.core.api.RegistryCenter;
-import cn.zyszero.phoenix.rpc.core.api.RpcRequest;
-import cn.zyszero.phoenix.rpc.core.api.RpcResponse;
+import cn.zyszero.phoenix.rpc.core.config.AppConfigProperties;
+import cn.zyszero.phoenix.rpc.core.config.ProviderConfigProperties;
 import cn.zyszero.phoenix.rpc.core.meta.InstanceMeta;
 import cn.zyszero.phoenix.rpc.core.meta.ProviderMeta;
 import cn.zyszero.phoenix.rpc.core.meta.ServiceMeta;
 import cn.zyszero.phoenix.rpc.core.util.MethodUtils;
-import cn.zyszero.phoenix.rpc.core.util.TypeUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -39,26 +35,25 @@ public class ProviderBootstrap implements ApplicationContextAware {
 
     private ApplicationContext applicationContext;
 
+    private RegistryCenter registryCenter;
+
+    private String port;
+
+    private AppConfigProperties appConfigProperties;
+
+    private ProviderConfigProperties providerConfigProperties;
+
     private MultiValueMap<String, ProviderMeta> skeleton = new LinkedMultiValueMap<>();
 
     private InstanceMeta instance;
 
-    @Value("${server.port}")
-    private String port;
 
-    @Value("${app.id}")
-    private String app;
+    public ProviderBootstrap(String port, AppConfigProperties appConfigProperties, ProviderConfigProperties providerConfigProperties) {
+        this.port = port;
+        this.appConfigProperties = appConfigProperties;
+        this.providerConfigProperties = providerConfigProperties;
+    }
 
-    @Value("${app.namespace}")
-    private String namespace;
-
-    @Value("${app.env}")
-    private String env;
-
-    @Value("#{${app.metas}}") // SPEL
-    Map<String, String> metas;
-
-    private RegistryCenter registryCenter;
 
     @PostConstruct // init-method
     public void init() {
@@ -72,7 +67,7 @@ public class ProviderBootstrap implements ApplicationContextAware {
     public void start() {
         String ip = InetAddress.getLocalHost().getHostAddress();
         this.instance = InstanceMeta.http(ip, Integer.parseInt(port));
-        this.instance.getParameters().putAll(metas);
+        this.instance.getParameters().putAll(providerConfigProperties.getMetas());
         registryCenter.start();
         skeleton.keySet().forEach(this::registerService);
     }
@@ -87,9 +82,9 @@ public class ProviderBootstrap implements ApplicationContextAware {
     private void registerService(String service) {
         ServiceMeta serviceMeta = ServiceMeta.builder()
                 .name(service)
-                .app(app)
-                .namespace(namespace)
-                .env(env)
+                .app(appConfigProperties.getId())
+                .namespace(appConfigProperties.getNamespace())
+                .env(appConfigProperties.getEnv())
                 .build();
         registryCenter.register(serviceMeta, instance);
     }
@@ -97,9 +92,9 @@ public class ProviderBootstrap implements ApplicationContextAware {
     private void unregisterService(String service) {
         ServiceMeta serviceMeta = ServiceMeta.builder()
                 .name(service)
-                .app(app)
-                .namespace(namespace)
-                .env(env)
+                .app(appConfigProperties.getId())
+                .namespace(appConfigProperties.getNamespace())
+                .env(appConfigProperties.getEnv())
                 .build();
         registryCenter.unregister(serviceMeta, instance);
     }

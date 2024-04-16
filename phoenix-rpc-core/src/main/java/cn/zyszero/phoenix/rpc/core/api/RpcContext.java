@@ -27,6 +27,14 @@ public class RpcContext {
     private Map<String, String> parameters = new HashMap<>();
 
 
+    public String param(String key) {
+        return parameters.get(key);
+    }
+
+    // phoenix.rpc.color = gray
+    // phoenix.rpc.gtrace_id
+    // gw -> service1 ->  service2(跨线程传递) ...
+    // http headers
     public static ThreadLocal<Map<String,String>> ContextParameters = ThreadLocal.withInitial(HashMap::new);
 
 

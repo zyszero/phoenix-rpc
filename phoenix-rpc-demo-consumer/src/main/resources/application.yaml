@@ -7,15 +7,17 @@ phoenix:
       zookeeper:
         server: 192.168.200.61:2181
         root: phoenix-rpc
-
-
-app:
-  id: app1
-  namespace: public
-  env: dev
-  retries: 2
-  timeout: 1000
-  gray-ratio: 10 # 0-100 流量灰度比例
+    app:
+      id: app1
+      namespace: public
+      env: dev
+    consumer:
+      retries: 2
+      timeout: 1000
+      gray-ratio: 10 # 0-100 流量灰度比例
+      faultLimit: 10 # 30s 内10次错误则隔离
+      halfOpenInitialDelay: 10000
+      halfOpenDelay: 60000
   
 logging:
   level:

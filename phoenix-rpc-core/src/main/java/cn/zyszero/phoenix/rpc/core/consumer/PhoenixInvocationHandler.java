@@ -49,10 +49,15 @@ public class PhoenixInvocationHandler implements InvocationHandler {
         this.service = service;
         this.context = context;
         this.providers = providers;
-        int timeout = Integer.parseInt(context.getParameters().getOrDefault("app.timeout", "1000"));
+        int timeout = Integer.parseInt(context.getParameters()
+                .getOrDefault("consumer.timeout", "1000"));
+        int halfOpenInitialDelay = Integer.parseInt(context.getParameters()
+                .getOrDefault("consumer.halfOpenInitialDelay", "10000"));
+        int halfOpenDelay = Integer.parseInt(context.getParameters()
+                .getOrDefault("consumer.halfOpenDelay", "60000"));
         this.httpInvoker = new OkHttpInvoker(timeout);
         this.executor = Executors.newScheduledThreadPool(1);
-        this.executor.scheduleWithFixedDelay(this::halfOpen, 10, 60, TimeUnit.SECONDS);
+        this.executor.scheduleWithFixedDelay(this::halfOpen, halfOpenInitialDelay, halfOpenDelay, TimeUnit.SECONDS);
     }
 
     private void halfOpen() {
@@ -73,7 +78,9 @@ public class PhoenixInvocationHandler implements InvocationHandler {
         rpcRequest.setMethodSign(MethodUtils.methodSign(method));
         rpcRequest.setArgs(args);
 
-        int retries = Integer.parseInt(context.getParameters().getOrDefault("app.retries", "2"));
+        int retries = Integer.parseInt(context.getParameters().getOrDefault("consumer.retries", "2"));
+        int faultLimit = Integer.parseInt(context.getParameters().getOrDefault("consumer.faultLimit", "10"));
+
         while (retries-- > 0) {
 
             log.debug(" ===> retries: " + retries);
@@ -120,8 +127,7 @@ public class PhoenixInvocationHandler implements InvocationHandler {
 
                         window.record(System.currentTimeMillis());
                         log.debug("instance {} in window with {}", instance, window.getSum());
-                        // 发生了 10 次，就做故障隔离
-                        if (window.getSum() >= 10) {
+                        if (window.getSum() >= faultLimit) {
                             isolate(instance);
                         }
                     }
