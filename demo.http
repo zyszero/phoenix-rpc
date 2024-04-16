@@ -41,7 +41,7 @@ Content-Type: application/json
 
 
 ### 获取用户信息
-POST http://localhost:8082/phoenix-rpc/
+POST http://localhost:8082/phoenix-rpc
 Content-Type: application/json
 
 {
@@ -54,7 +54,7 @@ Content-Type: application/json
 
 
 ### 获取用户信息
-POST http://localhost:8080/phoenix-rpc/
+POST http://localhost:8080/phoenix-rpc
 Content-Type: application/json
 
 {

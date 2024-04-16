@@ -19,7 +19,7 @@ public class SpringBootTransport {
 
     // 使用 HTTP + json 实现序列化和通信
 
-    @RequestMapping("/phoenix-rpc/")
+    @RequestMapping("/phoenix-rpc")
     public RpcResponse<Object> invoke(@RequestBody RpcRequest request) {
         return providerInvoker.invoke(request);
     }
