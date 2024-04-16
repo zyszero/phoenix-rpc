@@ -22,11 +22,14 @@ import java.util.*;
 public class TypeUtils {
 
     public static Object cast(Object origin, Class<?> type) {
+        log.debug("cast: origin = " + origin);
+        log.debug("cast: type = " + type);
         if (origin == null) {
             return null;
         }
         Class<?> originClass = origin.getClass();
         if (type.isAssignableFrom(originClass)) {
+            log.debug(" ======> assignable {} -> {}", originClass, type);
             return origin;
         }
 
@@ -35,8 +38,10 @@ public class TypeUtils {
             if (origin instanceof List list) {
                 origin = list.toArray();
             }
+            log.debug(" ======> list/[] -> []/" + type);
             int length = Array.getLength(origin);
             Class<?> componentType = type.getComponentType();
+            log.debug(" ======> [] componentType : " + componentType);
             Object resultArray = Array.newInstance(componentType, length);
             for (int i = 0; i < length; i++) {
                 if (componentType.isPrimitive() || componentType.getPackageName().startsWith("java")) {
@@ -49,12 +54,19 @@ public class TypeUtils {
             return resultArray;
         }
 
-        if (origin instanceof Map map) {
+        if (origin instanceof HashMap map) {
             // 如果是 Map 转换成 JSONObject, 利用 fastjson 进行转换
+            log.debug(" ======> map -> " + type);
             JSONObject jsonObject = new JSONObject(map);
             return jsonObject.toJavaObject(type);
         }
 
+        if (origin instanceof JSONObject jsonObject) {
+            log.debug(" ======> JSONObject -> " + type);
+            return jsonObject.toJavaObject(type);
+        }
+
+        log.debug(" ======> Primitive types.");
         if (type == int.class || type == Integer.class) {
             return Integer.parseInt(origin.toString());
         }
@@ -86,6 +98,8 @@ public class TypeUtils {
 
     @Nullable
     public static Object castMethodResult(Method method, Object data) {
+        log.debug("castMethodResult: method = " + method);
+        log.debug("castMethodResult: data = " + data);
         Class<?> type = method.getReturnType();
         Type genericReturnType = method.getGenericReturnType();
         return castGeneric(data, type, genericReturnType);
@@ -94,10 +108,12 @@ public class TypeUtils {
 
     @SuppressWarnings("unchecked")
     public static Object castGeneric(Object data, Class<?> type, Type genericReturnType) {
+        log.debug("castGeneric: data = " + data);
         log.debug("method.getReturnType() = " + type);
         log.debug("method.getGenericReturnType() = " + genericReturnType);
-        if (data instanceof JSONObject jsonResult) {
-            if (Map.class.isAssignableFrom(type)) {
+        if (data instanceof Map map) { // data是map的情况包括两种，一种是HashMap，一种是JSONObject
+            if (Map.class.isAssignableFrom(type)) { // 目标类型是 Map，此时data可能是map也可能是JO
+                log.debug(" ======> map -> map");
                 Map resultMap = new HashMap<>();
                 log.debug(genericReturnType.toString());
                 if (genericReturnType instanceof ParameterizedType parameterizedType) {
@@ -106,15 +122,23 @@ public class TypeUtils {
                     Class<?> valueType = (Class<?>) actualTypeArguments[1];
                     log.debug("keyType  : " + keyType);
                     log.debug("valueType: " + valueType);
-                    for (Map.Entry<String, Object> entry : jsonResult.entrySet()) {
-                        resultMap.put(TypeUtils.cast(entry.getKey(), keyType), TypeUtils.cast(entry.getValue(), valueType));
-                    }
+                    map.forEach((k, v) -> resultMap.put(TypeUtils.cast(k, keyType), TypeUtils.cast(v, valueType)));
                 }
                 return resultMap;
             }
-            return jsonResult.toJavaObject(type);
-        } else if (data instanceof List<?> list) {
+            if (data instanceof JSONObject jsonObject) { // 此时 type 是Pojo，且 data 是JO
+                log.debug(" ======> JSONObject -> Pojo");
+                return jsonObject.toJavaObject(type);
+            } else if (!Map.class.isAssignableFrom(type)) { // 此时 type 是Pojo类型，data 是Map
+                log.debug(" ======> map -> Pojo");
+                return new JSONObject(map).toJavaObject(type);
+            } else {
+                log.debug(" ======> map -> ?");
+                return data;
+            }
+        } else if (data instanceof List list) {
             if (type.isArray()) {
+                log.debug(" ======> list -> []");
                 Object[] array = list.toArray();
                 Class<?> componentType = type.getComponentType();
                 Object resultArray = Array.newInstance(componentType, array.length);
@@ -128,6 +152,7 @@ public class TypeUtils {
                 }
                 return resultArray;
             } else if (List.class.isAssignableFrom(type)) {
+                log.debug(" ======> list -> list");
                 List<Object> resultList = new ArrayList<>(list.size());
                 log.debug("genericReturnType: {}", genericReturnType.toString());
                 if (genericReturnType instanceof ParameterizedType parameterizedType) {
