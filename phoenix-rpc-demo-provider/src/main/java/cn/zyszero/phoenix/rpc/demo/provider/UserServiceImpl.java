@@ -1,8 +1,10 @@
 package cn.zyszero.phoenix.rpc.demo.provider;
 
 import cn.zyszero.phoenix.rpc.core.annotation.PhoenixProvider;
+import cn.zyszero.phoenix.rpc.core.api.RpcContext;
 import cn.zyszero.phoenix.rpc.demo.api.User;
 import cn.zyszero.phoenix.rpc.demo.api.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
@@ -137,5 +139,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public void setTimeoutPorts(String timeoutPorts) {
         this.timeoutPorts = timeoutPorts;
+    }
+
+    @Override
+    public String echoParameter(String key) {
+        System.out.println(" ====>> RpcContext.ContextParameters: ");
+        RpcContext.ContextParameters.get().forEach((k, v) -> System.out.println(k + " -> " + v));
+        return RpcContext.getContextParameter(key);
     }
 }
