@@ -2,14 +2,17 @@ package cn.zyszero.phoenix.rpc.core.provider;
 
 import cn.zyszero.phoenix.rpc.core.api.RegistryCenter;
 import cn.zyszero.phoenix.rpc.core.registry.zk.ZookeeperRegistryCenter;
+import cn.zyszero.phoenix.rpc.core.transport.SpringBootTransport;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.Order;
 
 @Slf4j
 @Configuration
+@Import({SpringBootTransport.class})
 public class ProviderConfig {
     @Bean
     public ProviderBootstrap providerBootstrap() {

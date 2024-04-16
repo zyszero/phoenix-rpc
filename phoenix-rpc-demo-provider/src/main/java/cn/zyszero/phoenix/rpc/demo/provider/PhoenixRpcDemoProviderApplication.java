@@ -4,6 +4,7 @@ import cn.zyszero.phoenix.rpc.core.api.RpcRequest;
 import cn.zyszero.phoenix.rpc.core.api.RpcResponse;
 import cn.zyszero.phoenix.rpc.core.provider.ProviderConfig;
 import cn.zyszero.phoenix.rpc.core.provider.ProviderInvoker;
+import cn.zyszero.phoenix.rpc.core.transport.SpringBootTransport;
 import cn.zyszero.phoenix.rpc.demo.api.User;
 import cn.zyszero.phoenix.rpc.demo.api.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,28 +34,9 @@ public class PhoenixRpcDemoProviderApplication {
 
 
     @Autowired
-    private ProviderInvoker providerInvoker;
-
-    // 使用 HTTP + json 实现序列化和通信
-
-    @RequestMapping("/")
-    public RpcResponse<Object> invoke(@RequestBody RpcRequest request) {
-        return providerInvoker.invoke(request);
-    }
+    private SpringBootTransport transport;
 
 
-    @Autowired
-    UserService userService;
-
-    @RequestMapping("/ports")
-    public RpcResponse<String> ports(@RequestParam("ports") String ports) {
-        userService.setTimeoutPorts(ports);
-        RpcResponse<String> rpcResponse = new RpcResponse<>();
-        rpcResponse.setStatues(true);
-        rpcResponse.setData("OK: " + ports);
-        return rpcResponse;
-
-    }
 
     @Bean
     public ApplicationRunner runner() {
@@ -71,7 +53,7 @@ public class PhoenixRpcDemoProviderApplication {
         rpcRequest.setMethodSign("findById@1_int");
         rpcRequest.setArgs(new Object[]{100});
 
-        RpcResponse rpcResponse = invoke(rpcRequest);
+        RpcResponse rpcResponse = transport.invoke(rpcRequest);
         System.out.println("response: " + rpcResponse.getData());
 
 
@@ -82,7 +64,7 @@ public class PhoenixRpcDemoProviderApplication {
         rpcRequest1.setMethodSign("findById@2_int_java.lang.String");
         rpcRequest1.setArgs(new Object[]{100, "zyszero"});
 
-        RpcResponse rpcResponse1 = invoke(rpcRequest1);
+        RpcResponse rpcResponse1 = transport.invoke(rpcRequest1);
         System.out.println("response: " + rpcResponse1.getData());
 
         // test 3 for List<User> method&parameter
@@ -94,7 +76,7 @@ public class PhoenixRpcDemoProviderApplication {
         userList.add(new User(100, "zyszero100"));
         userList.add(new User(101, "zyszero101"));
         request3.setArgs(new Object[]{userList});
-        RpcResponse<Object> rpcResponse3 = invoke(request3);
+        RpcResponse<Object> rpcResponse3 = transport.invoke(request3);
         System.out.println("return : " + rpcResponse3.getData());
 
         // test 4 for Map<String, User> method&parameter
@@ -106,7 +88,7 @@ public class PhoenixRpcDemoProviderApplication {
         userMap.put("P100", new User(100, "zyszero100"));
         userMap.put("P101", new User(101, "zyszero101"));
         request4.setArgs(new Object[]{userMap});
-        RpcResponse<Object> rpcResponse4 = invoke(request4);
+        RpcResponse<Object> rpcResponse4 = transport.invoke(request4);
         System.out.println("return : " + rpcResponse4.getData());
     }
 }
