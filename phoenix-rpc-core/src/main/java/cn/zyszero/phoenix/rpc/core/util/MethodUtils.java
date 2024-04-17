@@ -1,6 +1,5 @@
 package cn.zyszero.phoenix.rpc.core.util;
 
-import cn.zyszero.phoenix.rpc.core.annotation.PhoenixConsumer;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.annotation.Annotation;

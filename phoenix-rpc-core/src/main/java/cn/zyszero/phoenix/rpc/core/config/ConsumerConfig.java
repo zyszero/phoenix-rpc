@@ -10,16 +10,16 @@ import cn.zyszero.phoenix.rpc.core.registry.zk.ZookeeperRegistryCenter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.Order;
 
 import java.util.List;
 
 @Slf4j
 @Configuration
-@Import({AppConfigProperties.class, ConsumerConfigProperties.class})
+@EnableConfigurationProperties({AppConfigProperties.class, ConsumerConfigProperties.class})
 public class ConsumerConfig {
 
     @Autowired
