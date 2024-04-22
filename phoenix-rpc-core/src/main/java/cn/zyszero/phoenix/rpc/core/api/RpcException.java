@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 
 /**
  * RPC 统一异常类.
+ *
  * @Author: zyszero
  * @Date: 2024/4/10 0:57
  */
@@ -22,8 +23,9 @@ public class RpcException extends RuntimeException {
         super(message);
     }
 
-    public RpcException(String message, Throwable cause) {
-        super(message, cause);
+    public RpcException(String message, String errorCode) {
+        super(message);
+        this.errorCode = errorCode;
     }
 
     public RpcException(Throwable cause) {
@@ -46,6 +48,7 @@ public class RpcException extends RuntimeException {
     // TODO refactor to error enum
     public static final String SOCKET_TIMEOUT_EX = "X001" + "-" + "http_invoke_timeout";
     public static final String NO_SUCH_METHOD_EX = "X002" + "-" + "method_not_exists";
+    public static final String EXCEED_LIMIT_EX = "X003" + "-" + "tps_exceed_limit";
     public static final String UNKNOWN_EX = "Z001" + "-" + "unknown";
 
 

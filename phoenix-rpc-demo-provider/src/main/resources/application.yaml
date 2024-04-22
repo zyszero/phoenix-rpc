@@ -17,7 +17,7 @@ phoenix:
         dc: bj
         gray: false
         unit: B001
-        tc: 25
+        tc: 25 # 流控值
 
 
 logging:
