@@ -5,7 +5,7 @@
 
     <groupId>cn.zyszero</groupId>
     <artifactId>phoenix-rpc</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>${phoenix-rpc.version}</version>
 
     <packaging>pom</packaging>
     <name>phoenix-rpc</name>
@@ -27,6 +27,7 @@
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
         <lombok.version>1.18.30</lombok.version>
         <spring.boot.version>3.2.3</spring.boot.version>
+        <phoenix-rpc.version>0.0.1-SNAPSHOT</phoenix-rpc.version>
     </properties>
 
     <dependencyManagement>
@@ -41,5 +42,34 @@
         </dependencies>
     </dependencyManagement>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>1.5.0</version>
+                <configuration>
+                    <updatePomFile>true</updatePomFile>
+                    <flattenMode>oss</flattenMode>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>flatten</id>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                        <phase>process-resources</phase>
+                    </execution>
+                    <execution>
+                        <id>flatten.clean</id>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                        <phase>clean</phase>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

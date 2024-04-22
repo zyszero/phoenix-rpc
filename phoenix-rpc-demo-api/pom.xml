@@ -6,10 +6,11 @@
     <parent>
         <groupId>cn.zyszero</groupId>
         <artifactId>phoenix-rpc</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>${phoenix-rpc.version}</version>
     </parent>
 
     <artifactId>phoenix-rpc-demo-api</artifactId>
+    <version>${phoenix-rpc.version}</version>
 
     <description>
         phoenix-rpc-demo-api
