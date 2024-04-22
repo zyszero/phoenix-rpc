@@ -3,14 +3,41 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>cn.zyszero</groupId>
+    <groupId>io.github.zyszero</groupId>
     <artifactId>phoenix-rpc</artifactId>
     <version>${phoenix-rpc.version}</version>
-
-    <packaging>pom</packaging>
     <name>phoenix-rpc</name>
     <description>phoenix-rpc</description>
+    <packaging>pom</packaging>
+    <url>https://github.com/zyszero/phoenix-rpc</url>
 
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <issueManagement>
+        <system>github</system>
+        <url>https://github.com/zyszero/phoenix-rpc/issues</url>
+    </issueManagement>
+
+    <scm>
+        <connection>scm:git@github.com:zyszero/phoenix-rpc.git</connection>
+        <developerConnection>scm:git@github.com:zyszero/phoenix-rpc.git</developerConnection>
+        <url>https://github.com/zyszero/phoenix-rpc</url>
+    </scm>
+
+
+    <developers>
+        <developer>
+            <name>zyszero</name>
+            <email>yushengzhongzys@gmail.com</email>
+            <url>https://io.github.zyszero</url>
+        </developer>
+    </developers>
 
     <modules>
         <module>phoenix-rpc-core</module>
@@ -27,20 +54,8 @@
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
         <lombok.version>1.18.30</lombok.version>
         <spring.boot.version>3.2.3</spring.boot.version>
-        <phoenix-rpc.version>0.0.1-SNAPSHOT</phoenix-rpc.version>
+        <phoenix-rpc.version>0.0.1</phoenix-rpc.version>
     </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring.boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <build>
         <plugins>
@@ -69,7 +84,98 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.1.0</version>
+                <inherited>true</inherited>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <excludeResources>true</excludeResources>
+                    <useDefaultExcludes>true</useDefaultExcludes>
+                </configuration>
+            </plugin>
+
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.1.0</version>
+                <inherited>true</inherited>
+                <executions>
+                    <execution>
+                        <id>bundle-sources</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <maxmemory>1024</maxmemory>
+                    <encoding>UTF-8</encoding>
+                    <show>protected</show>
+                    <notree>true</notree>
+
+                    <!-- Avoid running into Java 8's very restrictive doclint issues -->
+                    <failOnError>false</failOnError>
+                    <doclint>none</doclint>
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.6</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!--   配置方式：https://central.sonatype.org/publish/publish-portal-maven/#deploymentname-->
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.4.0</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <publishingServerId>central</publishingServerId>
+                            <tokenAuth>true</tokenAuth>
+                            <autoPublish>true</autoPublish>
+                            <excludeArtifacts>
+                                <excludeArtifact>phoenix-rpc-demo-api</excludeArtifact>
+                                <excludeArtifact>phoenix-rpc-demo-provider</excludeArtifact>
+                                <excludeArtifact>phoenix-rpc-demo-consumer</excludeArtifact>
+                            </excludeArtifacts>
+                        </configuration>
+                    </plugin>
+
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

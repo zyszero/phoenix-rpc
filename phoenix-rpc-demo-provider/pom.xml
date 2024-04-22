@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>cn.zyszero</groupId>
+        <groupId>io.github.zyszero</groupId>
         <artifactId>phoenix-rpc</artifactId>
         <version>${phoenix-rpc.version}</version>
     </parent>
@@ -13,6 +13,17 @@
     <name>phoenix-rpc-demo-provider</name>
     <description>phoenix-rpc-demo-provider</description>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring.boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -27,15 +38,15 @@
         </dependency>
 
         <dependency>
-            <groupId>cn.zyszero</groupId>
+            <groupId>io.github.zyszero</groupId>
             <artifactId>phoenix-rpc-demo-api</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>${phoenix-rpc.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>cn.zyszero</groupId>
+            <groupId>io.github.zyszero</groupId>
             <artifactId>phoenix-rpc-core</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>${phoenix-rpc.version}</version>
         </dependency>
 
         <dependency>

@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>cn.zyszero</groupId>
+        <groupId>io.github.zyszero</groupId>
         <artifactId>phoenix-rpc</artifactId>
         <version>${phoenix-rpc.version}</version>
     </parent>
@@ -24,11 +24,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
+            <version>1.18.30</version>
         </dependency>
     </dependencies>
 

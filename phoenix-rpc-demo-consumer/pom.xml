@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>cn.zyszero</groupId>
+        <groupId>io.github.zyszero</groupId>
         <artifactId>phoenix-rpc</artifactId>
         <version>${phoenix-rpc.version}</version>
     </parent>
@@ -13,8 +13,36 @@
     <name>phoenix-rpc-demo-consumer</name>
     <description>phoenix-rpc-demo-consumer</description>
 
+    <properties>
+        <skip_maven_deploy>true</skip_maven_deploy>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring.boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
+
+        <dependency>
+            <groupId>io.github.zyszero</groupId>
+            <artifactId>phoenix-rpc-core</artifactId>
+            <version>${phoenix-rpc.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.zyszero</groupId>
+            <artifactId>phoenix-rpc-demo-api</artifactId>
+            <version>${phoenix-rpc.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
@@ -34,22 +62,9 @@
         </dependency>
 
         <dependency>
-            <groupId>cn.zyszero</groupId>
-            <artifactId>phoenix-rpc-core</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>cn.zyszero</groupId>
-            <artifactId>phoenix-rpc-demo-api</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>cn.zyszero</groupId>
+            <groupId>io.github.zyszero</groupId>
             <artifactId>phoenix-rpc-demo-provider</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>${phoenix-rpc.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -58,30 +73,30 @@
         <plugins>
 
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
-                <configuration>
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>org.springframework.boot</groupId>
-                            <artifactId>spring-boot-configuration-processor</artifactId>
-                            <version>${spring.boot.version}</version>
-                        </path>
-                        <path>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                            <version>${lombok.version}</version>
-                        </path>
-                    </annotationProcessorPaths>
-                    <!-- 编译参数写在 arg 内，解决 Spring Boot 3.2 的 Parameter Name Discovery 问题 -->
-                    <debug>false</debug>
-                    <compilerArgs>
-                        <arg>-parameters</arg>
-                    </compilerArgs>
-                </configuration>
-            </plugin>
+            <!--            <plugin>-->
+            <!--                <groupId>org.apache.maven.plugins</groupId>-->
+            <!--                <artifactId>maven-compiler-plugin</artifactId>-->
+            <!--                <version>${maven-compiler-plugin.version}</version>-->
+            <!--                <configuration>-->
+            <!--                    <annotationProcessorPaths>-->
+            <!--                        <path>-->
+            <!--                            <groupId>org.springframework.boot</groupId>-->
+            <!--                            <artifactId>spring-boot-configuration-processor</artifactId>-->
+            <!--                            <version>${spring.boot.version}</version>-->
+            <!--                        </path>-->
+            <!--                        <path>-->
+            <!--                            <groupId>org.projectlombok</groupId>-->
+            <!--                            <artifactId>lombok</artifactId>-->
+            <!--                            <version>${lombok.version}</version>-->
+            <!--                        </path>-->
+            <!--                    </annotationProcessorPaths>-->
+            <!--                    &lt;!&ndash; 编译参数写在 arg 内，解决 Spring Boot 3.2 的 Parameter Name Discovery 问题 &ndash;&gt;-->
+            <!--                    <debug>false</debug>-->
+            <!--                    <compilerArgs>-->
+            <!--                        <arg>-parameters</arg>-->
+            <!--                    </compilerArgs>-->
+            <!--                </configuration>-->
+            <!--            </plugin>-->
 
             <plugin>
                 <groupId>org.springframework.boot</groupId>
