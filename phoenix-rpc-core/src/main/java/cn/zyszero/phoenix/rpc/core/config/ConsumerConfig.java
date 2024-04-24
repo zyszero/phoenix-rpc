@@ -10,6 +10,7 @@ import cn.zyszero.phoenix.rpc.core.registry.zk.ZookeeperRegistryCenter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,14 +20,21 @@ import java.util.List;
 
 @Slf4j
 @Configuration
-@EnableConfigurationProperties({AppConfigProperties.class, ConsumerConfigProperties.class})
+@EnableConfigurationProperties({AppProperties.class, ConsumerProperties.class})
 public class ConsumerConfig {
 
     @Autowired
-    private AppConfigProperties appConfigProperties;
+    private AppProperties appProperties;
 
     @Autowired
-    private ConsumerConfigProperties consumerConfigProperties;
+    private ConsumerProperties consumerProperties;
+
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ApolloChangedListener provider_apolloChangedListener() {
+        return new ApolloChangedListener();
+    }
 
     @Bean
     public ConsumerBootstrap consumerBootstrap() {
@@ -50,9 +58,8 @@ public class ConsumerConfig {
     }
 
     @Bean
-    @SuppressWarnings("unchecked")
     public Router<InstanceMeta> route() {
-        return new GrayRouter(consumerConfigProperties.getGrayRatio());
+        return new GrayRouter(consumerProperties.getGrayRatio());
     }
 
     @Bean(initMethod = "start", destroyMethod = "stop")
@@ -76,14 +83,10 @@ public class ConsumerConfig {
         context.setRouter(router);
         context.setLoadBalancer(loadBalancer);
         context.setFilters(filters);
-        context.getParameters().put("app.id", appConfigProperties.getId());
-        context.getParameters().put("app.namespace", appConfigProperties.getNamespace());
-        context.getParameters().put("app.env", appConfigProperties.getEnv());
-        context.getParameters().put("consumer.retries", String.valueOf(consumerConfigProperties.getRetries()));
-        context.getParameters().put("consumer.timeout", String.valueOf(consumerConfigProperties.getTimeout()));
-        context.getParameters().put("consumer.faultLimit", String.valueOf(consumerConfigProperties.getFaultLimit()));
-        context.getParameters().put("consumer.halfOpenInitialDelay", String.valueOf(consumerConfigProperties.getHalfOpenInitialDelay()));
-        context.getParameters().put("consumer.halfOpenDelay", String.valueOf(consumerConfigProperties.getHalfOpenDelay()));
+        context.getParameters().put("app.id", appProperties.getId());
+        context.getParameters().put("app.namespace", appProperties.getNamespace());
+        context.getParameters().put("app.env", appProperties.getEnv());
+        context.setConsumerProperties(consumerProperties);
         return context;
     }
 

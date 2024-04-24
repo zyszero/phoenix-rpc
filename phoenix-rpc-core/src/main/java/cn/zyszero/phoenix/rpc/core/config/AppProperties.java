@@ -2,7 +2,6 @@ package cn.zyszero.phoenix.rpc.core.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * app config properties.
@@ -10,9 +9,8 @@ import org.springframework.context.annotation.Configuration;
  * @Date: 2024/4/16 23:42
  */
 @Data
-@Configuration
 @ConfigurationProperties(prefix = "phoenix.rpc.app")
-public class AppConfigProperties {
+public class AppProperties {
 
     // for app instance
     private String id = "app1";

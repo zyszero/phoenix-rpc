@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +18,7 @@ import org.springframework.core.annotation.Order;
 
 @Slf4j
 @Configuration
-@EnableConfigurationProperties({AppConfigProperties.class, ProviderConfigProperties.class})
+@EnableConfigurationProperties({AppProperties.class, ProviderProperties.class})
 @Import({SpringBootTransport.class})
 public class ProviderConfig {
 
@@ -25,14 +26,21 @@ public class ProviderConfig {
     private String port;
 
     @Autowired
-    private AppConfigProperties appConfigProperties;
+    private AppProperties appProperties;
 
     @Autowired
-    private ProviderConfigProperties providerConfigProperties;
+    private ProviderProperties providerProperties;
+
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ApolloChangedListener provider_apolloChangedListener() {
+        return new ApolloChangedListener();
+    }
 
     @Bean
     public ProviderBootstrap providerBootstrap() {
-        return new ProviderBootstrap(port, appConfigProperties, providerConfigProperties);
+        return new ProviderBootstrap(port, appProperties, providerProperties);
     }
 
 

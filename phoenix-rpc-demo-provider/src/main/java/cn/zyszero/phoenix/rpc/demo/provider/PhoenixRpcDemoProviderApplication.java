@@ -1,11 +1,12 @@
 package cn.zyszero.phoenix.rpc.demo.provider;
 
-import cn.zyszero.phoenix.rpc.core.api.RpcException;
 import cn.zyszero.phoenix.rpc.core.api.RpcRequest;
 import cn.zyszero.phoenix.rpc.core.api.RpcResponse;
 import cn.zyszero.phoenix.rpc.core.config.ProviderConfig;
+import cn.zyszero.phoenix.rpc.core.config.ProviderProperties;
 import cn.zyszero.phoenix.rpc.core.transport.SpringBootTransport;
 import cn.zyszero.phoenix.rpc.demo.api.User;
+import com.ctrip.framework.apollo.spring.annotation.EnableApolloConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
@@ -14,13 +15,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @SpringBootApplication
 @RestController
+@EnableApolloConfig
 @Import(ProviderConfig.class)
 public class PhoenixRpcDemoProviderApplication {
 
@@ -33,8 +32,15 @@ public class PhoenixRpcDemoProviderApplication {
     private SpringBootTransport transport;
 
 
+    @Autowired
+    ProviderProperties providerProperties;
+
+
     @Bean
     public ApplicationRunner runner() {
+        System.out.println(" ===> ProviderConfigProperties: ");
+        providerProperties.getMetas().forEach((k, v) -> System.out.println("ProviderConfigProperties: " + k + " -> " + v));
+
         return args -> {
             testAll();
         };

@@ -2,8 +2,8 @@ package cn.zyszero.phoenix.rpc.core.provider;
 
 import cn.zyszero.phoenix.rpc.core.annotation.PhoenixProvider;
 import cn.zyszero.phoenix.rpc.core.api.RegistryCenter;
-import cn.zyszero.phoenix.rpc.core.config.AppConfigProperties;
-import cn.zyszero.phoenix.rpc.core.config.ProviderConfigProperties;
+import cn.zyszero.phoenix.rpc.core.config.AppProperties;
+import cn.zyszero.phoenix.rpc.core.config.ProviderProperties;
 import cn.zyszero.phoenix.rpc.core.meta.InstanceMeta;
 import cn.zyszero.phoenix.rpc.core.meta.ProviderMeta;
 import cn.zyszero.phoenix.rpc.core.meta.ServiceMeta;
@@ -39,19 +39,19 @@ public class ProviderBootstrap implements ApplicationContextAware {
 
     private String port;
 
-    private AppConfigProperties appConfigProperties;
+    private AppProperties appProperties;
 
-    private ProviderConfigProperties providerConfigProperties;
+    private ProviderProperties providerProperties;
 
     private MultiValueMap<String, ProviderMeta> skeleton = new LinkedMultiValueMap<>();
 
     private InstanceMeta instance;
 
 
-    public ProviderBootstrap(String port, AppConfigProperties appConfigProperties, ProviderConfigProperties providerConfigProperties) {
+    public ProviderBootstrap(String port, AppProperties appProperties, ProviderProperties providerProperties) {
         this.port = port;
-        this.appConfigProperties = appConfigProperties;
-        this.providerConfigProperties = providerConfigProperties;
+        this.appProperties = appProperties;
+        this.providerProperties = providerProperties;
     }
 
 
@@ -67,7 +67,7 @@ public class ProviderBootstrap implements ApplicationContextAware {
     public void start() {
         String ip = InetAddress.getLocalHost().getHostAddress();
         this.instance = InstanceMeta.http(ip, Integer.parseInt(port));
-        this.instance.getParameters().putAll(providerConfigProperties.getMetas());
+        this.instance.getParameters().putAll(providerProperties.getMetas());
         registryCenter.start();
         skeleton.keySet().forEach(this::registerService);
     }
@@ -82,9 +82,9 @@ public class ProviderBootstrap implements ApplicationContextAware {
     private void registerService(String service) {
         ServiceMeta serviceMeta = ServiceMeta.builder()
                 .name(service)
-                .app(appConfigProperties.getId())
-                .namespace(appConfigProperties.getNamespace())
-                .env(appConfigProperties.getEnv())
+                .app(appProperties.getId())
+                .namespace(appProperties.getNamespace())
+                .env(appProperties.getEnv())
                 .build();
         registryCenter.register(serviceMeta, instance);
     }
@@ -92,9 +92,9 @@ public class ProviderBootstrap implements ApplicationContextAware {
     private void unregisterService(String service) {
         ServiceMeta serviceMeta = ServiceMeta.builder()
                 .name(service)
-                .app(appConfigProperties.getId())
-                .namespace(appConfigProperties.getNamespace())
-                .env(appConfigProperties.getEnv())
+                .app(appProperties.getId())
+                .namespace(appProperties.getNamespace())
+                .env(appProperties.getEnv())
                 .build();
         registryCenter.unregister(serviceMeta, instance);
     }

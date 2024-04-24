@@ -54,7 +54,7 @@
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
         <lombok.version>1.18.30</lombok.version>
         <spring.boot.version>3.2.3</spring.boot.version>
-        <phoenix-rpc.version>0.0.1</phoenix-rpc.version>
+        <phoenix-rpc.version>0.0.5</phoenix-rpc.version>
     </properties>
 
     <build>

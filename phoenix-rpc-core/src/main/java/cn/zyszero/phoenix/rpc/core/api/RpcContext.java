@@ -1,5 +1,6 @@
 package cn.zyszero.phoenix.rpc.core.api;
 
+import cn.zyszero.phoenix.rpc.core.config.ConsumerProperties;
 import cn.zyszero.phoenix.rpc.core.meta.InstanceMeta;
 import lombok.Data;
 
@@ -25,6 +26,9 @@ public class RpcContext {
      * 比如：机房、单元等
      */
     private Map<String, String> parameters = new HashMap<>();
+
+
+    private ConsumerProperties consumerProperties;
 
 
     public String param(String key) {

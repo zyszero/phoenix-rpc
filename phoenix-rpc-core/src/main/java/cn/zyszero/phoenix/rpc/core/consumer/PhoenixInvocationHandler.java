@@ -49,12 +49,9 @@ public class PhoenixInvocationHandler implements InvocationHandler {
         this.service = service;
         this.context = context;
         this.providers = providers;
-        int timeout = Integer.parseInt(context.getParameters()
-                .getOrDefault("consumer.timeout", "1000"));
-        int halfOpenInitialDelay = Integer.parseInt(context.getParameters()
-                .getOrDefault("consumer.halfOpenInitialDelay", "10000"));
-        int halfOpenDelay = Integer.parseInt(context.getParameters()
-                .getOrDefault("consumer.halfOpenDelay", "60000"));
+        int timeout = context.getConsumerProperties().getTimeout();
+        int halfOpenInitialDelay = context.getConsumerProperties().getHalfOpenInitialDelay();
+        int halfOpenDelay = context.getConsumerProperties().getHalfOpenDelay();
         this.httpInvoker = new OkHttpInvoker(timeout);
         this.executor = Executors.newScheduledThreadPool(1);
         this.executor.scheduleWithFixedDelay(this::halfOpen, halfOpenInitialDelay, halfOpenDelay, TimeUnit.SECONDS);
@@ -78,8 +75,8 @@ public class PhoenixInvocationHandler implements InvocationHandler {
         rpcRequest.setMethodSign(MethodUtils.methodSign(method));
         rpcRequest.setArgs(args);
 
-        int retries = Integer.parseInt(context.getParameters().getOrDefault("consumer.retries", "2"));
-        int faultLimit = Integer.parseInt(context.getParameters().getOrDefault("consumer.faultLimit", "10"));
+        int retries = context.getConsumerProperties().getRetries();
+        int faultLimit = context.getConsumerProperties().getFaultLimit();
 
         while (retries-- > 0) {
 

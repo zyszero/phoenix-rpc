@@ -42,7 +42,7 @@ public class ProviderInvoker {
 
     public ProviderInvoker(ProviderBootstrap providerBootstrap) {
         this.skeleton = providerBootstrap.getSkeleton();
-        this.metas = providerBootstrap.getProviderConfigProperties().getMetas();
+        this.metas = providerBootstrap.getProviderProperties().getMetas();
         this.trafficControl = Integer.parseInt(metas.getOrDefault("tc", "20"));
     }
 

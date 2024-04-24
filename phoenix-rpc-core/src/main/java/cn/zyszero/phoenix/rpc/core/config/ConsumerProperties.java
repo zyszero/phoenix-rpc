@@ -2,16 +2,14 @@ package cn.zyszero.phoenix.rpc.core.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * @Author: zyszero
  * @Date: 2024/4/16 23:45
  */
 @Data
-@Configuration
 @ConfigurationProperties(prefix = "phoenix.rpc.consumer")
-public class ConsumerConfigProperties {
+public class ConsumerProperties {
     // for ha and governance
     private int retries = 1;
 
