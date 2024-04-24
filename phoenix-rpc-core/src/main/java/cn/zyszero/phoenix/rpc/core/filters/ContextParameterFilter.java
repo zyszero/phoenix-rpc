@@ -15,7 +15,7 @@ import java.util.Map;
  * @Author: zyszero
  * @Date: 2024/4/16 20:49
  */
-public class ParameterFilter implements Filter {
+public class ContextParameterFilter implements Filter {
 
     @Override
     public Object preFilter(RpcRequest request) {

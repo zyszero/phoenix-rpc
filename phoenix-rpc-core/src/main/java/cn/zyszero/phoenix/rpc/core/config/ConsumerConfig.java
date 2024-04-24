@@ -4,7 +4,7 @@ import cn.zyszero.phoenix.rpc.core.api.*;
 import cn.zyszero.phoenix.rpc.core.cluster.GrayRouter;
 import cn.zyszero.phoenix.rpc.core.cluster.RoundRibonLoadBalancer;
 import cn.zyszero.phoenix.rpc.core.consumer.ConsumerBootstrap;
-import cn.zyszero.phoenix.rpc.core.filters.ParameterFilter;
+import cn.zyszero.phoenix.rpc.core.filters.ContextParameterFilter;
 import cn.zyszero.phoenix.rpc.core.meta.InstanceMeta;
 import cn.zyszero.phoenix.rpc.core.registry.zk.ZookeeperRegistryCenter;
 import lombok.extern.slf4j.Slf4j;
@@ -70,7 +70,7 @@ public class ConsumerConfig {
 
     @Bean
     public Filter defaultFilter() {
-        return new ParameterFilter();
+        return new ContextParameterFilter();
     }
 
 
