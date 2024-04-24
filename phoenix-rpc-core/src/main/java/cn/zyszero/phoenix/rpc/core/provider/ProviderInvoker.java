@@ -30,11 +30,6 @@ public class ProviderInvoker {
 
     private final MultiValueMap<String, ProviderMeta> skeleton;
 
-
-    // todo 1201 : 改成map，针对不同的服务用不同的流控值
-    // todo 1202 : 对多个节点是共享一个数值，，，把这个map放到redis
-    private final Integer trafficControl;
-
     final Map<String, String> metas;
 
     final Map<String, SlidingTimeWindow> windows = new HashMap<>();
@@ -43,7 +38,6 @@ public class ProviderInvoker {
     public ProviderInvoker(ProviderBootstrap providerBootstrap) {
         this.skeleton = providerBootstrap.getSkeleton();
         this.metas = providerBootstrap.getProviderProperties().getMetas();
-        this.trafficControl = Integer.parseInt(metas.getOrDefault("tc", "20"));
     }
 
     public RpcResponse<Object> invoke(RpcRequest request) {
@@ -56,6 +50,8 @@ public class ProviderInvoker {
         String service = request.getService();
         synchronized (windows) {
             SlidingTimeWindow window = windows.computeIfAbsent(service, k -> new SlidingTimeWindow());
+            int trafficControl = Integer.parseInt(metas.getOrDefault("tc", "20"));
+            log.debug(" ===>> trafficControl:{} for {}", trafficControl, service);
             if (window.calcSum() > trafficControl) {
                 System.out.println(window);
                 throw new RpcException("service " + service + " invoked in 30s/[" +
