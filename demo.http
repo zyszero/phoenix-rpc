@@ -1,21 +1,17 @@
-### 获取用户信息
-GET http://localhost:8080/user?id=100
+### 获取8080端口的用户信息
+GET http://localhost:8080/phoenix-rpc/user?id=100
 
+### 修改灰度比例值
+GET http://localhost:8080/phoenix-rpc/gray?radio=100
 
-### 获取用户信息
-GET http://localhost:8080/find?timeout=1100
+### 通过8080调用超时接口
+GET http://localhost:8080/phoenix-rpc/find?timeout=1100
 
 ### 通过8081调用set Timeout Ports
 GET http://localhost:8081/ports?ports=8080,8094
 
-
-### 修改灰度比例值
-GET http://localhost:8080/gray?radio=100
-
-
-
 ### 获取用户信息
-POST http://localhost:8080/
+POST http://localhost:8080/phoenix-rpc
 Content-Type: application/json
 
 {
@@ -27,7 +23,7 @@ Content-Type: application/json
 }
 
 ### 获取订单信息
-POST http://localhost:8080/
+POST http://localhost:8080/phoenix-rpc
 Content-Type: application/json
 
 {

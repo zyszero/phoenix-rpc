@@ -6,15 +6,21 @@ import cn.zyszero.phoenix.rpc.core.config.ProviderConfig;
 import cn.zyszero.phoenix.rpc.core.config.ProviderProperties;
 import cn.zyszero.phoenix.rpc.core.transport.SpringBootTransport;
 import cn.zyszero.phoenix.rpc.demo.api.User;
+import cn.zyszero.phoenix.rpc.demo.api.UserService;
 import com.ctrip.framework.apollo.spring.annotation.EnableApolloConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.context.properties.ConfigurationPropertiesRebinder;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.sql.SQLOutput;
 import java.util.*;
 
 @SpringBootApplication
@@ -35,13 +41,33 @@ public class PhoenixRpcDemoProviderApplication {
     @Autowired
     ProviderProperties providerProperties;
 
+    @RequestMapping("/metas")
+    public String meta() {
+        System.out.println(System.identityHashCode(providerProperties.getMetas()));
+        return providerProperties.getMetas().toString();
+    }
+
+    @Autowired
+    UserService userService;
+
+    @RequestMapping("/ports")
+    public RpcResponse<String> ports(@RequestParam("ports") String ports) {
+        userService.setTimeoutPorts(ports);
+        RpcResponse<String> response = new RpcResponse<>();
+        response.setStatus(true);
+        response.setData("OK:" + ports);
+        return response;
+    }
 
     @Bean
-    public ApplicationRunner runner() {
-        System.out.println(" ===> ProviderConfigProperties: ");
-        providerProperties.getMetas().forEach((k, v) -> System.out.println("ProviderConfigProperties: " + k + " -> " + v));
-
+    public ApplicationRunner runner(ApplicationContext context) {
         return args -> {
+
+            System.out.println(" ===> ProviderConfigProperties: ");
+            providerProperties.getMetas().forEach((k, v) -> System.out.println("ProviderConfigProperties: " + k + " -> " + v));
+
+            ConfigurationPropertiesRebinder rebinder = context.getBean(ConfigurationPropertiesRebinder.class);
+            System.out.println(rebinder);
             testAll();
         };
     }

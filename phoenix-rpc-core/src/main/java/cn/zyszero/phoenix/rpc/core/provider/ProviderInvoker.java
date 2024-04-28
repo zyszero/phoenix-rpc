@@ -4,6 +4,7 @@ import cn.zyszero.phoenix.rpc.core.api.RpcContext;
 import cn.zyszero.phoenix.rpc.core.api.RpcException;
 import cn.zyszero.phoenix.rpc.core.api.RpcRequest;
 import cn.zyszero.phoenix.rpc.core.api.RpcResponse;
+import cn.zyszero.phoenix.rpc.core.config.ProviderProperties;
 import cn.zyszero.phoenix.rpc.core.governance.SlidingTimeWindow;
 import cn.zyszero.phoenix.rpc.core.meta.ProviderMeta;
 import cn.zyszero.phoenix.rpc.core.util.TypeUtils;
@@ -30,14 +31,14 @@ public class ProviderInvoker {
 
     private final MultiValueMap<String, ProviderMeta> skeleton;
 
-    final Map<String, String> metas;
-
     final Map<String, SlidingTimeWindow> windows = new HashMap<>();
 
 
+    final ProviderProperties providerProperties;
+
     public ProviderInvoker(ProviderBootstrap providerBootstrap) {
         this.skeleton = providerBootstrap.getSkeleton();
-        this.metas = providerBootstrap.getProviderProperties().getMetas();
+        this.providerProperties = providerBootstrap.getProviderProperties();
     }
 
     public RpcResponse<Object> invoke(RpcRequest request) {
@@ -50,7 +51,7 @@ public class ProviderInvoker {
         String service = request.getService();
         synchronized (windows) {
             SlidingTimeWindow window = windows.computeIfAbsent(service, k -> new SlidingTimeWindow());
-            int trafficControl = Integer.parseInt(metas.getOrDefault("tc", "20"));
+            int trafficControl = Integer.parseInt(providerProperties.getMetas().getOrDefault("tc", "20"));
             log.debug(" ===>> trafficControl:{} for {}", trafficControl, service);
             if (window.calcSum() > trafficControl) {
                 System.out.println(window);

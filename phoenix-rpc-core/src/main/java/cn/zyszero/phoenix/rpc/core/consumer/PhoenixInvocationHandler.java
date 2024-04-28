@@ -168,7 +168,7 @@ public class PhoenixInvocationHandler implements InvocationHandler {
     }
 
     private static Object castReturnResult(Method method, RpcResponse<?> rpcResponse) {
-        if (rpcResponse.isStatues()) {
+        if (rpcResponse.isStatus()) {
             return TypeUtils.castMethodResult(method, rpcResponse.getData());
         } else {
             RpcException exception = rpcResponse.getException();
