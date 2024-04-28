@@ -7,15 +7,34 @@ phoenix:
       zookeeper:
         server: localhost:2182
         root: phoenix-rpc
+    app:
+      id: app1
+      namespace: public
+      env: test
+    consumer:
+      retries: 2
+      timeout: 1000
+      gray-ratio: 10 # 0-100 流量灰度比例
+      faultLimit: 10 # 30s 内10次错误则隔离
+      halfOpenInitialDelay: 10000
+      halfOpenDelay: 60000
+
 
 app:
   id: app1
-  namespace: public
-  env: dev
-  retries: 2
-  timeout: 1000
+apollo:
+  cacheDir: C:\\code\\phoenix-rpc            #配置本地配置缓存目录
+  cluster: default                           #指定使用哪个集群的配置
+  meta: http://localhost:8080           #DEV环境配置中心地址
+  autoUpdateInjectedSpringProperties: true   #是否开启 Spring 参数自动更新
+  bootstrap:
+    enabled: true                            #是否开启 Apollo
+    namespaces: app1                         #设置 Namespace
+    eagerLoad:
+      enabled: false                         #将 Apollo 加载提到初始化日志系统之前
 
 logging:
   level:
-    root: error
-    cn.zyszero.phoenix.rpc: debug
+    root: info
+    cn.zyszero.phoenix.rpc: info
+    com.ctrip: debug

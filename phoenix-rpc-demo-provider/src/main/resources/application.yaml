@@ -18,11 +18,6 @@ phoenix:
         unit: B001
         tc: 25 # 流控值
 
-logging:
-  level:
-    root: error
-    cn.zyszero.phoenix.rpc: debug
-
 app:
   id: app1
 apollo:
@@ -35,3 +30,10 @@ apollo:
     namespaces: app1                         #设置 Namespace
     eagerLoad:
       enabled: false                         #将 Apollo 加载提到初始化日志系统之前
+
+
+logging:
+  level:
+    root: error
+    cn.zyszero.phoenix.rpc: debug
+    com.ctrip: info

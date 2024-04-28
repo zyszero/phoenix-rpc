@@ -16,4 +16,10 @@ import java.util.Map;
 public class ProviderProperties {
 
     private Map<String, String> metas = new HashMap<>();
+
+    private String test;
+
+    public void setTest(String test) {
+        this.test = test;
+    }
 }

@@ -47,6 +47,7 @@
     </modules>
 
     <properties>
+        <phoenix-rpc.version>0.0.6-SNAPSHOT</phoenix-rpc.version>
         <java.version>17</java.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
@@ -54,7 +55,7 @@
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
         <lombok.version>1.18.30</lombok.version>
         <spring.boot.version>3.2.3</spring.boot.version>
-        <phoenix-rpc.version>0.0.5</phoenix-rpc.version>
+        <apollo.version>2.2.0</apollo.version>
     </properties>
 
     <build>
