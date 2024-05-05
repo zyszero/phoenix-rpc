@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * OKHttp 实现的 HttpInvoker
+ *
  * @Author: zyszero
  * @Date: 2024/4/1 21:11
  */
@@ -48,6 +49,38 @@ public class OkHttpInvoker implements HttpInvoker {
                     .string();
             log.debug("respJson: " + respJson);
             return JSON.parseObject(respJson, RpcResponse.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public String post(String requestString, String url) {
+        log.debug(" ===> post  url = {}, requestString = {}", requestString, url);
+        Request request = new Request.Builder()
+                .url(url)
+                .post(RequestBody.create(requestString, JSON_TYPE))
+                .build();
+        try {
+            String respJson = client.newCall(request).execute().body().string();
+            log.debug(" ===> respJson = " + respJson);
+            return respJson;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public String get(String url) {
+        log.debug(" ===> get url = " + url);
+        Request request = new Request.Builder()
+                .url(url)
+                .get()
+                .build();
+        try {
+            String respJson = client.newCall(request).execute().body().string();
+            log.debug(" ===> respJson = " + respJson);
+            return respJson;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
