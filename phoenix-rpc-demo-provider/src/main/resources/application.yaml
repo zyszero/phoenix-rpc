@@ -18,6 +18,9 @@ phoenix:
         unit: B001
         tc: 25 # 流控值
 
+  registry:
+    servers: http://localhost:8484
+
 app:
   id: app1
 apollo:
