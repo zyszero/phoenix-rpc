@@ -18,6 +18,7 @@ import org.apache.zookeeper.CreateMode;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +31,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ZookeeperRegistryCenter implements RegistryCenter {
 
-    private static CuratorFramework client = null;
 
     @Value("${phoenix.rpc.registry.zookeeper.server}")
     private String zkServer;
@@ -38,6 +38,9 @@ public class ZookeeperRegistryCenter implements RegistryCenter {
     @Value("${phoenix.rpc.registry.zookeeper.root}")
     private String zkRoot;
 
+    private CuratorFramework client = null;
+
+    private List<TreeCache> caches = new ArrayList<>();
 
     private boolean running = false;
 
@@ -64,6 +67,8 @@ public class ZookeeperRegistryCenter implements RegistryCenter {
             log.info(" ===> zk client has stopped, ignored.");
             return;
         }
+        log.info(" ===> zk tree cache closed.");
+        caches.forEach(TreeCache::close);
         log.info(" ===> zk client stopped.");
         client.close();
     }
@@ -117,7 +122,7 @@ public class ZookeeperRegistryCenter implements RegistryCenter {
     }
 
     @NotNull
-    private static List<InstanceMeta> mapInstances(List<String> nodes, String servicePath) {
+    private List<InstanceMeta> mapInstances(List<String> nodes, String servicePath) {
         return nodes.stream()
                 .map(node -> {
                     String[] strs = node.split("_");
@@ -154,5 +159,6 @@ public class ZookeeperRegistryCenter implements RegistryCenter {
             listener.fire(new Event(nodes));
         });
         cache.start();
+        caches.add(cache);
     }
 }
