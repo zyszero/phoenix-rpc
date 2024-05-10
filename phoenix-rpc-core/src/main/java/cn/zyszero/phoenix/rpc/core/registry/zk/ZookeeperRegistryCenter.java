@@ -38,8 +38,16 @@ public class ZookeeperRegistryCenter implements RegistryCenter {
     @Value("${phoenix.rpc.registry.zookeeper.root}")
     private String zkRoot;
 
+
+    private boolean running = false;
+
     @Override
-    public void start() {
+    public synchronized void start() {
+        if (running) {
+            log.info(" ===> zk client has started to server[" + zkServer + "/" + zkRoot + "], ignored.");
+            return;
+        }
+
         RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 3);
         client = CuratorFrameworkFactory.builder()
                 .connectString(zkServer)
@@ -51,7 +59,11 @@ public class ZookeeperRegistryCenter implements RegistryCenter {
     }
 
     @Override
-    public void stop() {
+    public synchronized void stop() {
+        if (!running) {
+            log.info(" ===> zk client has stopped, ignored.");
+            return;
+        }
         log.info(" ===> zk client stopped.");
         client.close();
     }
