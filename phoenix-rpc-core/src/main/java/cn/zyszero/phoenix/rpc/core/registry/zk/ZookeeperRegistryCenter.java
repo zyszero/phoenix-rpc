@@ -25,6 +25,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
+ * zk 注册中心.
+ *
  * @Author: zyszero
  * @Date: 2024/3/25 23:25
  */
@@ -152,12 +154,17 @@ public class ZookeeperRegistryCenter implements RegistryCenter {
                 .setCacheData(true)
                 .setMaxDepth(2)
                 .build();
-        cache.getListenable().addListener((curator, event) -> {
-            // 有任何节点变动，这里都会触发
-            log.info("zk subscribe event: " + event);
-            List<InstanceMeta> nodes = fetchAll(service);
-            listener.fire(new Event(nodes));
-        });
+        cache.getListenable().addListener(
+                (curator, event) -> {
+                    synchronized (ZookeeperRegistryCenter.class) {
+                        if (running) {
+                            // 有任何节点变动，这里都会触发
+                            log.info("zk subscribe event: " + event);
+                            List<InstanceMeta> nodes = fetchAll(service);
+                            listener.fire(new Event(nodes));
+                        }
+                    }
+                });
         cache.start();
         caches.add(cache);
     }
