@@ -6,7 +6,7 @@ import cn.zyszero.phoenix.rpc.core.cluster.RoundRibonLoadBalancer;
 import cn.zyszero.phoenix.rpc.core.consumer.ConsumerBootstrap;
 import cn.zyszero.phoenix.rpc.core.filters.ContextParameterFilter;
 import cn.zyszero.phoenix.rpc.core.meta.InstanceMeta;
-import cn.zyszero.phoenix.rpc.core.registry.zk.ZookeeperRegistryCenter;
+import cn.zyszero.phoenix.rpc.core.registry.phoenix.PhoenixRegistryCenter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
@@ -67,7 +67,8 @@ public class ConsumerConfig {
 
     @Bean(initMethod = "start", destroyMethod = "stop")
     public RegistryCenter consumer_rc() {
-        return new ZookeeperRegistryCenter();
+//        return new ZookeeperRegistryCenter();
+        return new PhoenixRegistryCenter();
     }
 
 

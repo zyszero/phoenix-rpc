@@ -3,7 +3,7 @@ package cn.zyszero.phoenix.rpc.core.config;
 import cn.zyszero.phoenix.rpc.core.api.RegistryCenter;
 import cn.zyszero.phoenix.rpc.core.provider.ProviderBootstrap;
 import cn.zyszero.phoenix.rpc.core.provider.ProviderInvoker;
-import cn.zyszero.phoenix.rpc.core.registry.zk.ZookeeperRegistryCenter;
+import cn.zyszero.phoenix.rpc.core.registry.phoenix.PhoenixRegistryCenter;
 import cn.zyszero.phoenix.rpc.core.transport.SpringBootTransport;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +64,6 @@ public class ProviderConfig {
 
     @Bean //(initMethod = "start", destroyMethod = "stop")
     public RegistryCenter provider_rc() {
-        return new ZookeeperRegistryCenter();
+        return new PhoenixRegistryCenter(); //  ZookeeperRegistryCenter();
     }
 }
