@@ -49,11 +49,6 @@
             <version>${phoenix-rpc.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
 
         <dependency>
             <groupId>com.ctrip.framework.apollo</groupId>
@@ -66,6 +61,13 @@
             <!--                    <artifactId>junit</artifactId>-->
             <!--                </exclusion>-->
             <!--            </exclusions>-->
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>

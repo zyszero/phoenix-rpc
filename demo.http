@@ -7,8 +7,11 @@ GET http://localhost:8080/phoenix-rpc/gray?radio=100
 ### 通过8080调用超时接口
 GET http://localhost:8080/phoenix-rpc/find?timeout=1100
 
-### 通过8081调用set Timeout Ports
+### 通过8081调用接口，修改超时时间
 GET http://localhost:8081/ports?ports=8080,8094
+
+### 通过8081调用配置项接口
+GET http://localhost:8081/metas
 
 ### 获取用户信息
 POST http://localhost:8080/phoenix-rpc

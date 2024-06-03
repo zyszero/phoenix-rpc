@@ -7,7 +7,7 @@ import cn.zyszero.phoenix.rpc.core.config.ProviderProperties;
 import cn.zyszero.phoenix.rpc.core.transport.SpringBootTransport;
 import cn.zyszero.phoenix.rpc.demo.api.User;
 import cn.zyszero.phoenix.rpc.demo.api.UserService;
-import com.ctrip.framework.apollo.spring.annotation.EnableApolloConfig;
+import io.github.zyszero.phoenix.config.client.annotation.EnablePhoenixConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
@@ -20,12 +20,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.sql.SQLOutput;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @SpringBootApplication
 @RestController
-@EnableApolloConfig
+//@EnableApolloConfig
+@EnablePhoenixConfig
 @Import(ProviderConfig.class)
 public class PhoenixRpcDemoProviderApplication {
 

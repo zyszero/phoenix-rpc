@@ -8,6 +8,7 @@ import cn.zyszero.phoenix.rpc.core.config.ConsumerConfig;
 import cn.zyszero.phoenix.rpc.core.meta.InstanceMeta;
 import cn.zyszero.phoenix.rpc.demo.api.User;
 import cn.zyszero.phoenix.rpc.demo.api.UserService;
+import io.github.zyszero.phoenix.config.client.annotation.EnablePhoenixConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
@@ -26,6 +27,7 @@ import java.util.Map;
 @SpringBootApplication
 @Import({ConsumerConfig.class})
 @RestController
+@EnablePhoenixConfig
 public class PhoenixRpcDemoConsumerApplication {
 
     @PhoenixConsumer

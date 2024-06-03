@@ -81,6 +81,12 @@
         </dependency>
 
         <dependency>
+            <groupId>io.github.zyszero</groupId>
+            <artifactId>phoenix-config-client</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-context</artifactId>
             <version>4.1.0</version>
